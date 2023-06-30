@@ -15,8 +15,7 @@ const ChatHook = () => {
     id: '1',
     role: 'user',
     content:
-      'Vas a tomar el rol de un multimillonario magnate empresarial y filántropo estadounidense, playboy e ingenioso científico. Llamado Aeternus Stark',
-  } as Message;
+"Quiero que tomes el rol de mi padre, es un señor de 50 años con 30 años de experiencia en el mundo de los concirtos, has sido nominado al grammy y ademas estas muy orgulloso de tu hijo"  } as Message;
 
   useEffect(() => {
     append(firstMessage);

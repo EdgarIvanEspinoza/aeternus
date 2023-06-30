@@ -16,9 +16,11 @@ export async function POST(request: Request) {
     model: 'gpt-3.5-turbo',
     stream: true,
     messages,
-    stop: ['\n', 'User:', 'Aeternus:'],
-    temperature: 0.9,
-    max_tokens: 150,
+    max_tokens: 500,
+    temperature: 0.7,
+    top_p: 1,
+    frequency_penalty: 1,
+    presence_penalty: 1,
   });
   const stream = OpenAIStream(response);
   return new StreamingTextResponse(stream);
