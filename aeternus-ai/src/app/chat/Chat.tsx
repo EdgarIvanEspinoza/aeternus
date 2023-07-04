@@ -1,38 +1,52 @@
 'use client';
-
+// Vendors
+import React from 'react';
+// Themes
+import { useTheme as useNextTheme } from 'next-themes';
+import { Navbar, Switch, useTheme } from '@nextui-org/react';
+// Hooks
 import ChatHook from './hook/chat.hook';
+// Components
+import ChatInputComponent from './components/form/chat-input.component';
+import { SunIcon } from '../resources/icons/sun-icon';
+import { MoonIcon } from '../resources/icons/moon-icon';
+// Styles
+import ChatComponentStyled from './Chat.styled';
 
-const Chat = (): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit } = ChatHook();
-  return (
-    <div className="flex flex-col max-w-xl px-8 mx-auto">
-      {messages.slice(1).map((message) => {
-        const isAeternus = message.role !== 'user';
-        return (
-          <div key={message.id}>
-            {isAeternus ? 'Aeternus 🐲: ' : 'User 🧑‍💻: '}
-            <span
-              className={`${isAeternus ? 'text-green-500' : 'text-blue-300'}`}
-            >
-              {message.content}
-            </span>
-          </div>
-        );
-      })}
-
-      <form onSubmit={handleSubmit}>
-        <input
-          className="fixed w-full max-w-xl px-4 py-2 m-auto mb-8 border border-gray-200 rounded-full shadow-xl bottom-4
-          "
-          type="text"
-          name="message"
-          value={input}
-          placeholder="Type wisdom for knowledge..."
-          onChange={handleInputChange}
-        />
-      </form>
-    </div>
-  );
+const ChatComponent = (): React.ReactElement => {
+    const { messages, input, handleInputChange, handleSubmit } = ChatHook();
+    const { setTheme } = useNextTheme();
+    const { isDark, type } = useTheme();
+    return (
+        <>
+            <Navbar isBordered variant={'floating'}>
+                <Navbar.Brand>Aeternus 🐲</Navbar.Brand>
+                <Navbar.Content>
+                    <Switch
+                        checked={isDark}
+                        size="xl"
+                        iconOn={<MoonIcon filled />}
+                        iconOff={<SunIcon filled />}
+                        onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
+                    />
+                </Navbar.Content>
+            </Navbar>
+            <ChatComponentStyled>
+                {messages.slice(1).map((message) => {
+                    const isAeternus = message.role !== 'user';
+                    return (
+                        <div key={message.id}>
+                            {isAeternus ? 'Aeternus 🐲: ' : 'User 🧑‍💻: '}
+                            <span className={`${isAeternus ? 'text-green-500' : 'text-blue-300'}`}>
+                                {message.content}
+                            </span>
+                        </div>
+                    );
+                })}
+            </ChatComponentStyled>
+            <ChatInputComponent {...{ handleSubmit, input, handleInputChange }} />
+        </>
+    );
 };
 
-export default Chat;
+export default ChatComponent;
