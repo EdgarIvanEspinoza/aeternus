@@ -25,8 +25,12 @@ const ChatComponent = (): React.ReactElement => {
                     <Switch
                         checked={isDark}
                         size="xl"
-                        iconOn={<MoonIcon filled />}
-                        iconOff={<SunIcon filled />}
+                        iconOn={
+                            <MoonIcon filled size={undefined} height={undefined} width={undefined} label={undefined} />
+                        }
+                        iconOff={
+                            <SunIcon filled size={undefined} height={undefined} width={undefined} label={undefined} />
+                        }
                         onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
                     />
                 </Navbar.Content>

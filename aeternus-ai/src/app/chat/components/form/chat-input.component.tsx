@@ -16,17 +16,25 @@ const ChatInputComponent = ({
 }: {
     handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     input: string;
-    handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleInputChange: any;
 }): React.ReactElement => (
     <ChatInputComponentStyled>
         <form onSubmit={handleSubmit}>
             <Input
                 {...constants.INPUT_PROPS}
                 value={input}
+                size="xl"
                 onChange={handleInputChange}
                 contentRight={
                     <SendButton>
-                        <SendIcon />
+                        <SendIcon
+                            filled={undefined}
+                            size={undefined}
+                            height={undefined}
+                            width={undefined}
+                            label={undefined}
+                            className={undefined}
+                        />
                     </SendButton>
                 }
             />
