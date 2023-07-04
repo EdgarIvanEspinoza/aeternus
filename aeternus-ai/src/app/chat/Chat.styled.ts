@@ -5,9 +5,15 @@ const ChatComponentStyled = styled.div`
     flex-direction: column-reverse;
     margin: 0 auto;
     height: 80vh;
-    width: 80%;
-    overflow: hidden;
+    width: 90%;
+    overflow: auto;
+    padding: 20px;
 `;
 ChatComponentStyled.displayName = 'ChatComponentStyled';
 
-export default ChatComponentStyled;
+const ChatInputStyled = styled.div`
+    transform: translateZ(0);
+`;
+ChatComponentStyled.displayName = 'ChatInputStyled';
+
+export { ChatComponentStyled, ChatInputStyled };

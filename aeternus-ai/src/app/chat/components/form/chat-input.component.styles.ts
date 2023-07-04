@@ -1,9 +1,7 @@
 import { styled } from 'styled-components';
 
 const ChatInputComponentStyled = styled.div`
-    margin: 30px auto;
-    height: 100%;
-    width: 100%;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
 `;
