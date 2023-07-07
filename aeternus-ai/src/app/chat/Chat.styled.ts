@@ -1,29 +1,34 @@
-import { styled } from 'styled-components';
+import { styled } from '@nextui-org/react';
 
-const ChatComponentStyled = styled.div`
-    display: flex;
-    flex-direction: column-reverse;
-    margin: 0 auto;
-    height: 70vh;
-    width: 70vw;
-    overflow: auto;
-    padding: 20px;
-`;
-ChatComponentStyled.displayName = 'ChatComponentStyled';
+const MainStyled = styled('div', {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+});
 
-const ChatInputStyled = styled.div`
-    transform: translateZ(0);
-`;
-ChatComponentStyled.displayName = 'ChatInputStyled';
+const ChatComponentStyled = styled('div', {
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    margin: '0 auto',
+    marginBottom: '50px',
+    height: '70vh',
+    width: '70vw',
+    overflow: 'auto',
+    padding: '20px',
+    flexGrow: 4,
+});
 
-const MainStyled = styled.div`
-    max-width: 70vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-`;
-ChatComponentStyled.displayName = 'MainStyled';
+const ChatInputStyled = styled('div', {
+    width: '100vw',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'sticky',
+    bottom: '0',
+    padding: '20px',
+    zIndex: 1,
+});
 
 export { ChatComponentStyled, ChatInputStyled, MainStyled };
