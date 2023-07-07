@@ -4,7 +4,7 @@ const ChatComponentStyled = styled.div`
     display: flex;
     flex-direction: column-reverse;
     margin: 0 auto;
-    height: 80vh;
+    height: 70vh;
     width: 70vw;
     overflow: auto;
     padding: 20px;
