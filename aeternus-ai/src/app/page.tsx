@@ -15,7 +15,7 @@ export default function App() {
 
     return (
         <NextThemesProvider
-            defaultTheme="system"
+            defaultTheme="dark"
             attribute="class"
             value={{
                 light: lightTheme.className,

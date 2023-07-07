@@ -35,7 +35,7 @@ const ChatComponent = (): React.ReactElement => {
                 <Navbar.Content>
                     <Switch
                         checked={isDark}
-                        size="xl"
+                        size="lg"
                         iconOn={
                             <MoonIcon filled size={undefined} height={undefined} width={undefined} label={undefined} />
                         }
@@ -47,7 +47,6 @@ const ChatComponent = (): React.ReactElement => {
                     />
                 </Navbar.Content>
             </Navbar>
-            <Spacer y={1} />
             <ChatComponentStyled>
                 {messages
                     .slice(1)

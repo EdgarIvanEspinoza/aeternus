@@ -5,30 +5,29 @@ const MainStyled = styled('div', {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+    height: '100vh',
+    maxWidth: '100vw',
 });
 
 const ChatComponentStyled = styled('div', {
     display: 'flex',
     flexDirection: 'column-reverse',
     margin: '0 auto',
-    marginBottom: '50px',
-    height: '70vh',
+    paddingBottom: '50px',
     width: '70vw',
     overflow: 'auto',
-    padding: '20px',
-    flexGrow: 4,
+    height: ' 100%',
+    flex: '1 0 auto',
+    maxHeight: '70vh',
 });
 
 const ChatInputStyled = styled('div', {
     width: '100vw',
+    alignSelf: 'flex-end',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
-    position: 'sticky',
-    bottom: '0',
-    padding: '20px',
-    zIndex: 1,
 });
 
 export { ChatComponentStyled, ChatInputStyled, MainStyled };
