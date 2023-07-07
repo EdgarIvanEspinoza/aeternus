@@ -11,16 +11,26 @@ import ChatInputComponent from './components/form/chat-input.component';
 import { SunIcon } from '../resources/icons/sun-icon';
 import { MoonIcon } from '../resources/icons/moon-icon';
 // Styles
-import { ChatComponentStyled, ChatInputStyled } from './Chat.styled';
+import { ChatComponentStyled, ChatInputStyled, MainStyled } from './Chat.styled';
 
 const ChatComponent = (): React.ReactElement => {
     const { messages, input, handleInputChange, handleSubmit } = ChatHook();
     const { setTheme } = useNextTheme();
     const { isDark, type } = useTheme();
     return (
-        <>
+        <MainStyled>
             <Navbar isBordered variant={'floating'}>
-                <Navbar.Brand>Aeternus 🐲</Navbar.Brand>
+                <Navbar.Brand>
+                    <Text
+                        h1
+                        size={50}
+                        css={{
+                            textGradient: '45deg, $blue600 -20%, $pink600 50%',
+                        }}
+                        weight="bold">
+                        Aeternus
+                    </Text>{' '}
+                </Navbar.Brand>
                 <Navbar.Content>
                     <Switch
                         checked={isDark}
@@ -31,6 +41,7 @@ const ChatComponent = (): React.ReactElement => {
                         iconOff={
                             <SunIcon filled size={undefined} height={undefined} width={undefined} label={undefined} />
                         }
+                        aria-label="Toggle dark mode"
                         onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
                     />
                 </Navbar.Content>
@@ -45,14 +56,24 @@ const ChatComponent = (): React.ReactElement => {
                             <ChatInputStyled>
                                 <div key={message.id}>
                                     {isAeternus ? 'Aeternus 🐲: ' : 'User 🧑‍💻: '}
-                                    <Text color={isAeternus ? 'success' : 'warning'}>{message.content}</Text>
+                                    <Text
+                                        h5
+                                        size="$xl"
+                                        css={{
+                                            textGradient: isAeternus
+                                                ? '45deg, $blue600 -20%, $pink600 50%'
+                                                : '45deg, $yellow600 -20%, $red600 100%',
+                                        }}
+                                        weight="bold">
+                                        {message.content}
+                                    </Text>
                                 </div>
                             </ChatInputStyled>
                         );
                     })}
             </ChatComponentStyled>
             <ChatInputComponent {...{ handleSubmit, input, handleInputChange }} />
-        </>
+        </MainStyled>
     );
 };
 

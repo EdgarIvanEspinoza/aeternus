@@ -4,6 +4,6 @@ export default {
         contentRightStyling: false,
         type: 'text',
         name: 'message',
-        placeholder: 'Type wisdom for knowledge...',
+        placeholder: 'Type...',
     },
 };

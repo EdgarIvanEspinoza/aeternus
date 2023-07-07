@@ -23,7 +23,7 @@ const ChatInputComponent = ({
             <Input
                 {...constants.INPUT_PROPS}
                 value={input}
-                size="xl"
+                css={{ width: '70vh' }}
                 onChange={handleInputChange}
                 contentRight={
                     <SendButton>
