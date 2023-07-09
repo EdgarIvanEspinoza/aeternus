@@ -4,18 +4,14 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: '🐲Aeternus AI',
-  description: 'Generated example of using Aeternus AI',
+    title: '🐲Aeternus AI',
+    description: 'Generated example of using Aeternus AI',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang="es">
+            <body className={inter.className}>{children}</body>
+        </html>
+    );
 }

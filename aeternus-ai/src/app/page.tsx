@@ -1,8 +1,11 @@
 'use client';
+// Vendor
 import * as React from 'react';
-import ChatComponent from '../app/chat/Chat';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+// Components
+import ChatComponent from './chat/Chat';
+import ModalComponent from './modal/Modal';
 
 export default function App() {
     const lightTheme = createTheme({
@@ -12,7 +15,7 @@ export default function App() {
     const darkTheme = createTheme({
         type: 'dark',
     });
-
+    const [username, setUsername] = React.useState('');
     return (
         <NextThemesProvider
             defaultTheme="dark"
@@ -22,7 +25,8 @@ export default function App() {
                 dark: darkTheme.className,
             }}>
             <NextUIProvider>
-                <ChatComponent />
+                <ModalComponent {...{ username, setUsername }} />
+                {username !== '' ? <ChatComponent {...{ username }} /> : null}
             </NextUIProvider>
         </NextThemesProvider>
     );

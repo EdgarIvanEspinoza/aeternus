@@ -1,0 +1,28 @@
+:root {
+    --primary: #000;
+    --secondary: rgba(229, 106, 245, 0.4);
+}
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary) var(--primary);
+}
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    opacity: 0;
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    opacity: 0;
+    background: transparent;
+}
+body {
+    min-height: 100vh;
+    /* mobile viewport bug fix */
+    min-height: -webkit-fill-available;
+}
+
+html {
+    height: -webkit-fill-available;
+}
