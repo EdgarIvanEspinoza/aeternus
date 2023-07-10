@@ -1,7 +1,7 @@
 // Vendor
 import React from 'react';
 // Components
-import { Input, Text } from '@nextui-org/react';
+import { Input, Link, Text } from '@nextui-org/react';
 import { SendButton } from './assets/send-icon/send-button.styled';
 import { SendIcon } from './assets/send-icon/send-icon';
 // Constants
@@ -37,8 +37,9 @@ const ChatInputComponent = ({
                 />
             </form>
             <Text color="#333" css={{ margin: '1rem 0rem', textAlign: 'center' }}>
-                Eres libre de escribir lo que quieras, pero ten en cuenta que no se guardará nada de lo que escribas.
+                Eres libre de escribir lo que quieras, pero ten en cuenta que no se guardará nada de lo que escribas.{' '}
             </Text>
+            <Link href="/policies">Ver Política de privadad y Términos y condiciones</Link>
         </ChatInputStyled>
     );
 };

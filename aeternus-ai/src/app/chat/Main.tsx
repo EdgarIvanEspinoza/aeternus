@@ -20,7 +20,7 @@ const MainComponent = (): React.ReactElement => {
                     {username ? <ChatComponent {...{ username }} /> : null}
                 </Container>
             </MainStyled>
-            <ModalComponent {...{ setUsername }} />
+            <ModalComponent {...{ setUsername, username }} />
         </>
     );
 };
