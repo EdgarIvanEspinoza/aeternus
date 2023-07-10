@@ -1,9 +1,5 @@
 import { styled } from '@nextui-org/react';
 
-const MainStyled = styled('div', {
-    display: 'block',
-});
-
 const ChatComponentStyled = styled('div', {
     display: 'flex',
     flexDirection: 'column-reverse',
@@ -23,4 +19,4 @@ const ChatInputStyled = styled('div', {
     alignItems: 'center',
 });
 
-export { ChatComponentStyled, ChatInputStyled, MainStyled };
+export { ChatComponentStyled, ChatInputStyled };

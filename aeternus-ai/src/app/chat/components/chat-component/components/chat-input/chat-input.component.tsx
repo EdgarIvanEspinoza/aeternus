@@ -2,11 +2,11 @@
 import React from 'react';
 // Components
 import { Input, Text } from '@nextui-org/react';
-import { SendButton } from './components/send-button.styled';
-import { SendIcon } from './components/send-icon';
+import { SendButton } from './assets/send-icon/send-button.styled';
+import { SendIcon } from './assets/send-icon/send-icon';
 // Constants
 import constants from './constants/chat-input.constants';
-import { ChatInputStyled } from '../../Chat.styled';
+import ChatInputStyled from './chat-input.component.styled';
 
 const ChatInputComponent = ({
     handleSubmit,
@@ -31,14 +31,7 @@ const ChatInputComponent = ({
                     onChange={handleInputChange}
                     contentRight={
                         <SendButton>
-                            <SendIcon
-                                filled={undefined}
-                                size={undefined}
-                                height={undefined}
-                                width={undefined}
-                                label={undefined}
-                                className={undefined}
-                            />
+                            <SendIcon />
                         </SendButton>
                     }
                 />

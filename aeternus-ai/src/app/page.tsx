@@ -4,8 +4,7 @@ import * as React from 'react';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 // Components
-import ChatComponent from './chat/Chat';
-import ModalComponent from './modal/Modal';
+import MainComponent from './chat/Main';
 
 export default function App() {
     const lightTheme = createTheme({
@@ -15,7 +14,6 @@ export default function App() {
     const darkTheme = createTheme({
         type: 'dark',
     });
-    const [username, setUsername] = React.useState('');
     return (
         <NextThemesProvider
             defaultTheme="dark"
@@ -25,8 +23,7 @@ export default function App() {
                 dark: darkTheme.className,
             }}>
             <NextUIProvider>
-                <ModalComponent {...{ username, setUsername }} />
-                {username !== '' ? <ChatComponent {...{ username }} /> : null}
+                <MainComponent />
             </NextUIProvider>
         </NextThemesProvider>
     );

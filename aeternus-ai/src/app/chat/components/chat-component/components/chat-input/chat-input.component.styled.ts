@@ -8,4 +8,4 @@ const ChatInputStyled = styled('div', {
     alignItems: 'center',
 });
 
-export default { ChatInputStyled };
+export default ChatInputStyled;

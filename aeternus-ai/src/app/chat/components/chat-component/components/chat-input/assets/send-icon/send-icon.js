@@ -1,11 +1,10 @@
-export const SendIcon = ({ fill = 'currentColor', filled, size, height, width, label, className, ...props }) => (
+export const SendIcon = ({ fill = 'currentColor', ...props }) => (
     <svg
         data-name="Iconly/Curved/Lock"
         xmlns="http://www.w3.org/2000/svg"
-        width={size || width || 24}
-        height={size || height || 24}
+        width={24}
+        height={24}
         viewBox="0 0 24 24"
-        className={className}
         {...props}>
         <g transform="translate(2 2)">
             <path

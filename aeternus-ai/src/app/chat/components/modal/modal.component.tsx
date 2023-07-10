@@ -1,11 +1,9 @@
 import React from 'react';
-import { Modal, Input, Checkbox, Button, Row, Text } from '@nextui-org/react';
+import { Modal, Input, Button, Text } from '@nextui-org/react';
 
 const ModalComponent = ({
-    username,
     setUsername,
 }: {
-    username: string;
     setUsername: React.Dispatch<React.SetStateAction<string>>;
 }): React.ReactElement => {
     const [visible, setVisible] = React.useState(true);
@@ -45,6 +43,7 @@ const ModalComponent = ({
                     placeholder="Tu nombre"
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
+                    aria-label="Name input"
                 />
             </Modal.Body>
             <Modal.Footer>

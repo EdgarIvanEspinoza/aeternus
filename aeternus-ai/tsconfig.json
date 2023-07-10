@@ -29,7 +29,7 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "src/app/chat/components/form/components/send-icon.js",
+        "src/app/chat/components/chat-component/components/chat-input/assets/send-icon.js",
         "src/components",
         "src/custom.d.ts"
     ],
