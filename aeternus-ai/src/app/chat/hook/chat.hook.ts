@@ -27,7 +27,7 @@ const ChatHook = (
     append({
       id: '1',
       role: 'system' as 'system',
-      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS}${username} ${config.INITIAL_MESSAGE}`,
+      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${config.INITIAL_MESSAGE}${username}`,
     });
   }, []);
 
