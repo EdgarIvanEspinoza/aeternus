@@ -11,18 +11,18 @@ import ModalComponent from './components/modal/modal.component';
 import { MainStyled } from './Main.styled';
 
 const MainComponent = (): React.ReactElement => {
-    const [username, setUsername] = React.useState('');
-    return (
-        <>
-            <MainStyled>
-                <Container>
-                    <NavbarComponent />
-                    {username ? <ChatComponent {...{ username }} /> : null}
-                </Container>
-            </MainStyled>
-            <ModalComponent {...{ setUsername, username }} />
-        </>
-    );
+  const [username, setUsername] = React.useState('');
+  return (
+    <>
+      <MainStyled>
+        <Container>
+          <NavbarComponent />
+          {username ? <ChatComponent {...{ username }} /> : null}
+        </Container>
+      </MainStyled>
+      <ModalComponent {...{ setUsername, username }} />
+    </>
+  );
 };
 
 export default MainComponent;
