@@ -8,8 +8,7 @@ import ChatHook from '../../hook/chat.hook';
 import { ChatComponentStyled } from './chat.component.styled';
 
 const ChatComponent = ({ username }: { username: string }): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit, moodMessages, moodInput, moodHandleSubmit } =
-    ChatHook(username);
+  const { messages, input, handleInputChange, handleSubmit, moodMessages } = ChatHook(username);
   // TODO: Send mood message to another call with the previous message to analyze the mood
   const moodResponse = moodMessages
     .slice(1)
@@ -25,7 +24,7 @@ const ChatComponent = ({ username }: { username: string }): React.ReactElement =
             const isAeternus = message.role !== 'user';
             return (
               <div key={message.id}>
-                {isAeternus ? `Aeternus 🐲: ${moodResponse}` : 'User 🧑‍💻: '}
+                {isAeternus ? `Aeternus 🐲: ${moodResponse}` : `${username} 🧑‍💻: `}
                 <Text
                   h5
                   size="$xl"
