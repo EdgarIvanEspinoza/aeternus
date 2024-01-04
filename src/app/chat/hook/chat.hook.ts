@@ -14,6 +14,7 @@ const ChatHook = (
   append: (message: Message) => void;
 } => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat();
+
   useEffect(() => {
     append({
       id: '1',

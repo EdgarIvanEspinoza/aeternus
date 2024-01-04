@@ -15,8 +15,8 @@ import { getNameFromUser } from './utils/main.utils';
 
 const MainComponent = (): React.ReactElement => {
   const [username, setUsername] = React.useState('');
-  const { user, isLoading } = useUser();
-  console.log('user', user);
+  const { user } = useUser();
+
   return (
     <>
       <MainStyled>
