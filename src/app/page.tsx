@@ -7,24 +7,24 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import MainComponent from './chat/Main';
 
 export default function App() {
-    const lightTheme = createTheme({
-        type: 'light',
-    });
+  const lightTheme = createTheme({
+    type: 'light',
+  });
 
-    const darkTheme = createTheme({
-        type: 'dark',
-    });
-    return (
-        <NextThemesProvider
-            defaultTheme="dark"
-            attribute="class"
-            value={{
-                light: lightTheme.className,
-                dark: darkTheme.className,
-            }}>
-            <NextUIProvider>
-                <MainComponent />
-            </NextUIProvider>
-        </NextThemesProvider>
-    );
+  const darkTheme = createTheme({
+    type: 'dark',
+  });
+  return (
+    <NextThemesProvider
+      defaultTheme="dark"
+      attribute="class"
+      value={{
+        light: lightTheme.className,
+        dark: darkTheme.className,
+      }}>
+      <NextUIProvider>
+        <MainComponent />
+      </NextUIProvider>
+    </NextThemesProvider>
+  );
 }

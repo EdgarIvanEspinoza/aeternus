@@ -7,13 +7,9 @@ import ChatHook from '../../hook/chat.hook';
 // Styles
 import { ChatComponentStyled } from './chat.component.styled';
 
-const ChatComponent = ({ username }: { username: string }): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit, moodMessages } = ChatHook(username);
-  // TODO: Send mood message to another call with the previous message to analyze the mood
-  const moodResponse = moodMessages
-    .slice(1)
-    .reverse()
-    .map((message: any) => message.content);
+const ChatComponent = ({ username }: { username: string | null | undefined }): React.ReactElement => {
+  const { messages, input, handleInputChange, handleSubmit } = ChatHook(username);
+
   return (
     <>
       <ChatComponentStyled>
@@ -24,7 +20,7 @@ const ChatComponent = ({ username }: { username: string }): React.ReactElement =
             const isAeternus = message.role !== 'user';
             return (
               <div key={message.id}>
-                {isAeternus ? `Aeternus 🐲: ${moodResponse}` : `${username} 🧑‍💻: `}
+                {isAeternus ? `Aeternus 🐲: ` : `${username} 🧑‍💻: `}
                 <Text
                   h5
                   size="$xl"

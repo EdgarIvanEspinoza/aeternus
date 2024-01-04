@@ -1,9 +1,10 @@
 import { Message, useChat } from 'ai/react';
 import { useEffect } from 'react';
 import config from './config/chat.hook.config';
+import React from 'react';
 
 const ChatHook = (
-  username: string
+  username: string | null | undefined
 ): {
   messages: Message[];
   input: string;
@@ -11,18 +12,8 @@ const ChatHook = (
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
   append: (message: Message) => void;
-  moodMessages: any;
-  moodInput: any;
-  moodHandleInputChange: any;
-  moodHandleSubmit: any;
 } => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat();
-  const {
-    messages: moodMessages,
-    input: moodInput,
-    handleInputChange: moodHandleInputChange,
-    handleSubmit: moodHandleSubmit,
-  } = useChat();
   useEffect(() => {
     append({
       id: '1',
@@ -32,10 +23,6 @@ const ChatHook = (
   }, []);
 
   return {
-    moodMessages,
-    moodInput,
-    moodHandleInputChange,
-    moodHandleSubmit,
     messages,
     input,
     handleInputChange,
