@@ -7,8 +7,8 @@ import ChatHook from '../../hook/chat.hook';
 // Styles
 import { ChatComponentStyled } from './chat.component.styled';
 
-const ChatComponent = ({ username }: { username: string | null | undefined }): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit } = ChatHook(username);
+const ChatComponent = ({ user }: any): React.ReactElement => {
+  const { messages, input, handleInputChange, handleSubmit } = ChatHook(user);
 
   return (
     <>
@@ -20,7 +20,7 @@ const ChatComponent = ({ username }: { username: string | null | undefined }): R
             const isAeternus = message.role !== 'user';
             return (
               <div key={message.id}>
-                {isAeternus ? `Aeternus 🐲: ` : `${username} 🧑‍💻: `}
+                {isAeternus ? `Aeternus 🐲: ` : `${user.name} 🧑‍💻: `}
                 <Text
                   h5
                   size="$xl"

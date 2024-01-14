@@ -1,10 +1,13 @@
+//Vendor
+import React, { useEffect } from 'react';
 import { Message, useChat } from 'ai/react';
-import { useEffect } from 'react';
+// Config
 import config from './config/chat.hook.config';
-import React from 'react';
+// Handlers
+import ChatHandlers from '../handlers/chat.handlers';
 
 const ChatHook = (
-  username: string | null | undefined
+  user: any
 ): {
   messages: Message[];
   input: string;
@@ -14,12 +17,16 @@ const ChatHook = (
   append: (message: Message) => void;
 } => {
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat();
+  const { handleRegisterUser, handlerGetMessages } = ChatHandlers({ name: user.name, email: user.email });
 
   useEffect(() => {
+    console.log('user', user);
+    handleRegisterUser();
+    handlerGetMessages();
     append({
       id: '1',
       role: 'system' as 'system',
-      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${config.INITIAL_MESSAGE}${username}`,
+      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${config.INITIAL_MESSAGE}${user.name}`,
     });
   }, []);
 
