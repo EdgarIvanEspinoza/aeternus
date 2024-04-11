@@ -5,34 +5,29 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
-  UserID        Int            @id @default(autoincrement())
-  Name          String
-  LastName      String
-  Email         String         @unique
+  id            Int            @id @default(autoincrement())
+  username      String
   Conversations Conversation[]
-  Message       Message[]
 }
 
 model Conversation {
-  ConversationID Int       @id @default(autoincrement())
-  UserID         Int
-  StartDate      DateTime
-  User           User      @relation(fields: [UserID], references: [UserID])
-  Messages       Message[]
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  User     User      @relation(fields: [userId], references: [id])
+  Messages Message[]
 }
 
 model Message {
-  MessageID      Int          @id @default(autoincrement())
-  ConversationID Int
-  UserID         Int?
-  SendDate       DateTime
-  Content        String
-  Conversation   Conversation @relation(fields: [ConversationID], references: [ConversationID])
-  User           User?        @relation(fields: [UserID], references: [UserID])
+  id             Int      @id @default(autoincrement())
+  username       String
+  message        String
+  createdAt      DateTime @default(now())
+  conversationId Int
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
 }

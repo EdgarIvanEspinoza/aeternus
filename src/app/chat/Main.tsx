@@ -11,6 +11,7 @@ import ModalComponent from './components/modal/modal.component';
 // Styles
 import { MainStyled } from './Main.styled';
 // Utils
+import { getNameFromUser } from './utils/main.utils';
 
 const MainComponent = (): React.ReactElement => {
   const [username, setUsername] = React.useState('');
@@ -21,7 +22,11 @@ const MainComponent = (): React.ReactElement => {
       <MainStyled>
         <Container>
           <NavbarComponent />
-          {!user ? <ModalComponent {...{ setUsername, username }} /> : <ChatComponent {...{ user }} />}
+          {!user ? (
+            <ModalComponent {...{ setUsername, username }} />
+          ) : (
+            <ChatComponent {...{ username: getNameFromUser(user) }} />
+          )}
         </Container>
       </MainStyled>
     </>
