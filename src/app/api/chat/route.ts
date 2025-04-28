@@ -14,11 +14,11 @@ export async function POST(request: Request) {
     model: 'gpt-4',
     stream: true,
     messages,
-    max_tokens: 500,
-    temperature: 0.8,
-    top_p: 1,
-    frequency_penalty: 1,
-    presence_penalty: 1,
+    max_tokens: 500, // Maximo de tokens a devolver
+    temperature: 0.8, // Entre 0 y 1, entre mas alto mas creativo
+    top_p: 1, // Entre 0 y 1, entre mas alto mas creativo
+    frequency_penalty: 1, // Entre -2 y 2, entre mas alto menos repetitivo
+    presence_penalty: 1, // Entre -2 y 2, entre mas alto menos repetitivo
   });
   const stream = OpenAIStream(response);
   return new StreamingTextResponse(stream);
