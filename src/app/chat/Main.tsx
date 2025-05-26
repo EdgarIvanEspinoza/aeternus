@@ -1,6 +1,6 @@
 'use client';
 // Vendors
-import React from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 // Themes
 import { Container } from '@nextui-org/react';
@@ -13,8 +13,8 @@ import { MainStyled } from './Main.styled';
 // Utils
 import { getNameFromUser } from './utils/main.utils';
 
-const MainComponent = (): React.ReactElement => {
-  const [username, setUsername] = React.useState('');
+const MainComponent = (): ReactElement => {
+  const [username, setUsername] = useState('');
   const { user } = useUser();
 
   return (

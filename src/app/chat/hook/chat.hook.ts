@@ -13,12 +13,42 @@ const ChatHook = (
 } => {
   const { messages, input, handleInputChange, handleSubmit, append } = useChat();
 
+  const fetchTraits = async () => {
+    try {
+      const res = await fetch('/api/ai/traits');
+      if (!res.ok) throw new Error('Server error');
+
+      const data = await res.json();
+      const traits = data.traits;
+
+      const described = traits.filter((t: any) => t.description);
+      const named = traits.filter((t: any) => !t.description).map((t: any) => t.name);
+
+      const describedText = described.map((t: any) => t.description).join(' ');
+      const namedText = named.length ? `He is ${named.slice(0, -1).join(', ')} and ${named.slice(-1)}.` : '';
+      const personality = `${namedText} ${describedText}`;
+
+      return personality;
+    } catch (err) {
+      console.error('Error fetching traits:', err);
+      return '';
+    }
+  };
+
+  console.log(messages);
+
   useEffect(() => {
-    append({
-      id: '1',
-      role: 'system' as 'system',
-      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${config.INITIAL_MESSAGE} ${username}`,
-    });
+    const initializeChat = async () => {
+      const personality = await fetchTraits();
+      console.log('Personality:', personality);
+      append({
+        id: '1',
+        role: 'system',
+        content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${personality} ${config.INITIAL_MESSAGE} ${username}`,
+      });
+    };
+
+    initializeChat();
   }, []);
 
   return {
