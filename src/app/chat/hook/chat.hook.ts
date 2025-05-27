@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Message, useChat } from '@ai-sdk/react';
 import config from './config/chat.hook.config';
+import jsonToSentence from '../utils/jsonToSentence';
 
 const ChatHook = (
   username: string | null | undefined
@@ -13,12 +14,31 @@ const ChatHook = (
 } => {
   const { messages, input, handleInputChange, handleSubmit, append } = useChat();
 
+  const fetchTraits = async () => {
+    try {
+      const res = await fetch('/api/ai/traits');
+      if (!res.ok) throw new Error('Server error');
+
+      const data = await res.json();
+      const traits = data.traits;
+      return jsonToSentence(traits);
+    } catch (err) {
+      console.error('Error fetching traits:', err);
+      return '';
+    }
+  };
+
   useEffect(() => {
-    append({
-      id: '1',
-      role: 'system' as 'system',
-      content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${config.INITIAL_MESSAGE} ${username}`,
-    });
+    const initializeChat = async () => {
+      const personality = await fetchTraits();
+      append({
+        id: '1',
+        role: 'system',
+        content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${personality} ${config.INITIAL_MESSAGE} ${username}`,
+      });
+    };
+
+    initializeChat();
   }, []);
 
   return {
