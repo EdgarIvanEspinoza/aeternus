@@ -69,13 +69,12 @@ export async function GET(req: NextRequest) {
 
     const traits = result.records.map((record) => {
       const node = record.get('personProfile');
-      console.log('personProfile', node);
       return node;
     });
 
     return NextResponse.json({ traits });
   } catch (error) {
-    console.error('Error fetching traits:', error);
+    console.error('[AI / Traits] Error fetching traits:', error);
     return NextResponse.json({ error: 'Failed to fetch traits' }, { status: 500 });
   } finally {
     await session.close();

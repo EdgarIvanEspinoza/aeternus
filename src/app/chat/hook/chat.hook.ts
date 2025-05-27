@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Message, useChat } from '@ai-sdk/react';
 import config from './config/chat.hook.config';
+import jsonToSentence from '../utils/jsonToSentence';
 
 const ChatHook = (
   username: string | null | undefined
@@ -20,27 +21,16 @@ const ChatHook = (
 
       const data = await res.json();
       const traits = data.traits;
-
-      const described = traits.filter((t: any) => t.description);
-      const named = traits.filter((t: any) => !t.description).map((t: any) => t.name);
-
-      const describedText = described.map((t: any) => t.description).join(' ');
-      const namedText = named.length ? `He is ${named.slice(0, -1).join(', ')} and ${named.slice(-1)}.` : '';
-      const personality = `${namedText} ${describedText}`;
-
-      return personality;
+      return jsonToSentence(traits);
     } catch (err) {
       console.error('Error fetching traits:', err);
       return '';
     }
   };
 
-  console.log(messages);
-
   useEffect(() => {
     const initializeChat = async () => {
       const personality = await fetchTraits();
-      console.log('Personality:', personality);
       append({
         id: '1',
         role: 'system',
