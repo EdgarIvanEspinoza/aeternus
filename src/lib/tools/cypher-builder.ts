@@ -4,21 +4,20 @@ import { openai } from '@ai-sdk/openai';
 import { checkIfUserExists } from '../neo4j/checkIfUserExists';
 import { getExampleNode } from '../neo4j/getExampleNode';
 import driver from '../neo4j/driver';
-import { getAllNodes } from '../neo4j/getAllNodes';
 
 export const cypherBuilderTool: Tool = {
   description:
     'Construye una consulta Cypher para crear o actualizar nodos en Neo4j, usando la estructura del nodo ejemplo Jacques  tu intencion es llenar de informacion el neo4j para obtener mucha información del USUARIO.',
   parameters: z.object({
-    user_name: z.string().describe('Nombre del usuario.'),
+    user_name: z.string().describe('El nombre a que te refieres a mi'),
     user_input: z.string().describe('Texto ingresado por el usuario.'),
   }),
   async execute({ user_name, user_input }) {
     let session;
+    console.log('Ejecutando cypherBuilderTool con:', { user_name, user_input });
     try {
       const example_node = await getExampleNode();
       const node_exists = await checkIfUserExists(user_name);
-      const actual_nodes = await getAllNodes();
       const prompt = `
 Eres una herramienta que genera código Cypher para Neo4j tu intencion es llenar de informacion el neo4j para obtener mucha información del USUARIO.
 
@@ -28,19 +27,20 @@ ${example_node}
 USUARIO: ${user_name}
 Input del USUARIO: "${user_input}"
 ¿El nodo ya existe?: ${node_exists ? 'Sí' : 'No'}
-
-Los nodos disponibles son ${actual_nodes}
-
+Los nodos de personas son "Person" con el nombre de el USUARIO que es ${user_name} y el input del usuario es "${user_input}".
 Objetivo:
 - Si el nodo NO existe, genera un Cypher CREATE con los atributos relevantes extraídos del input.
 - Si el nodo SÍ existe, genera un Cypher MATCH y SET para actualizar solo las propiedades nuevas.
 - Devuelve también un resumen del propósito del query y una sugerencia de conversación para seguir recolectando datos.
 
-- Devuelve un objeto JSON con:
+Para guardar fechas debes usar date y luego la fecha que queramos guardar. como por ejemplo: date("1990-04-15")
+
+
+- Devuelve la resuesta en un objeto JSON con:
   {
     "cypher": "el query Cypher generado",
     "purpose": "resumen del objetivo del query",
-    "reaction": "una frase que pueda decir Lequi como respuesta humana (ej: '¡Perfecto, lo recordaré!' o 'Genial. Ya lo guardé.')"
+    "reaction": "informacion faltante del usuario que deberia preguntarle para completar el nodo"')"
   }
 
 No incluyas explicaciones adicionales ni comentarios en el Cypher.
