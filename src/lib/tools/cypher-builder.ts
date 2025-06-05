@@ -7,44 +7,41 @@ import driver from '../neo4j/driver';
 
 export const cypherBuilderTool: Tool = {
   description:
-    'Construye una consulta Cypher para crear o actualizar nodos en Neo4j, usando la estructura del nodo ejemplo Jacques  tu intencion es llenar de informacion el neo4j para obtener mucha información del USUARIO.',
+    'This is a tool so you can save information about the user. Lets say is a Memory storage just for you. Use it when you think is necesary to save something revelant that you might need in the future, for example any carcteristics of the user, where he lives, likes, dislikes, etc.',
   parameters: z.object({
-    user_name: z.string().describe('El nombre a que te refieres a mi'),
-    user_input: z.string().describe('Texto ingresado por el usuario.'),
+    user_name: z.string().describe('Name of the User'),
+    user_input: z.string().describe('Input of the user to create'),
   }),
   async execute({ user_name, user_input }) {
     let session;
-    console.log('Ejecutando cypherBuilderTool con:', { user_name, user_input });
+    console.log(`[TOOL / Cypher Build]=> Parameters user_name:${user_name} user_input: ${user_input}`);
     try {
       const example_node = await getExampleNode();
       const node_exists = await checkIfUserExists(user_name);
       const prompt = `
-Eres una herramienta que genera código Cypher para Neo4j tu intencion es llenar de informacion el neo4j para obtener mucha información del USUARIO.
+      You are a tool to generate Cypher code for neo4j. You main objetive is to fill information in de neo4j db with the User Information.
+      This is an example of another user. This is the node of Jacques, with this you have all the properties of the node wich you want to fill with the input of the user:
+      Example Node of Jacques: ${example_node}
+      The user is: ${user_name}
+      The input of the user is: ${user_input}
+      This will tell you if the node of the user exists or not: The node ${node_exists ? 'exist' : 'doesnt exist'}
 
-Esto es un Nodo de ejemplo para que veas como es una estructura con sus propiedasdes, este es el nodo de Jacques (que sirve como plantilla):
-${example_node}
+      The node of people like the user is called "Person"
+      
+      Your main Objetive:
+      -If the node doesnt exist, generate a new Cypher with CREATE and the relevant attributes that you can identify from the input of the user.
+      -If the node does exist, generate a cypher with MATCH and SET to update the properties.
+      -Also return the purpose to create this query and a suggestion of conversation to keep saving more information of the user.
 
-USUARIO: ${user_name}
-Input del USUARIO: "${user_input}"
-¿El nodo ya existe?: ${node_exists ? 'Sí' : 'No'}
-Los nodos de personas son "Person" con el nombre de el USUARIO que es ${user_name} y el input del usuario es "${user_input}".
-Objetivo:
-- Si el nodo NO existe, genera un Cypher CREATE con los atributos relevantes extraídos del input.
-- Si el nodo SÍ existe, genera un Cypher MATCH y SET para actualizar solo las propiedades nuevas.
-- Devuelve también un resumen del propósito del query y una sugerencia de conversación para seguir recolectando datos.
+      To save Dates if necesary, the format is with date and between parenthesis, for example: date("1990-04-15")
+      Now you can return the answer in a JSON object with:
+        {
+        "cypher": "the generated Cypher",
+        "purpose": "briefing of the purpose to create this Cypher",
+        "reaction": "Missing information that you can suggest to the other AI so it can ask"
+        } 
 
-Para guardar fechas debes usar date y luego la fecha que queramos guardar. como por ejemplo: date("1990-04-15")
-
-
-- Devuelve la resuesta en un objeto JSON con:
-  {
-    "cypher": "el query Cypher generado",
-    "purpose": "resumen del objetivo del query",
-    "reaction": "informacion faltante del usuario que deberia preguntarle para completar el nodo"')"
-  }
-
-No incluyas explicaciones adicionales ni comentarios en el Cypher.
-y que no sea mdx solo el JSON plano.
+        Do not include any other suggetions o comments in the Cypher, and dont response with MDX, only in flat JSON
 `;
 
       const { steps } = await generateText({
@@ -52,16 +49,13 @@ y que no sea mdx solo el JSON plano.
         prompt,
       });
 
-      if (!steps?.length) {
-        throw new Error('No se recibieron pasos de respuesta del modelo.');
-      }
-      console.log('Respuesta del modelo:', steps[0].text);
+      console.log('[TOOL / Cypher Build]=> Response:', steps[0].text);
       let parsed;
       try {
         parsed = JSON.parse(steps[0].text);
       } catch (jsonError) {
         console.error('Error parsing JSON response from generateText:', jsonError);
-        throw new Error('Respuesta del modelo inválida, no se pudo parsear JSON.');
+        throw new Error('Error parsing JSON response from generateText.');
       }
 
       session = driver.session();
@@ -69,9 +63,9 @@ y que no sea mdx solo el JSON plano.
 
       return { text: parsed.reaction };
     } catch (error) {
-      console.error('Error en cypherBuilderTool.execute:', error);
+      console.error('Error in cypherBuilderTool.execute:', error);
       return {
-        text: 'Estoy intentando recordar lo que me dijiste pero ando nublado y tengo problemas para entenderte.',
+        text: 'Im trying to remeber what you just have said, but i feel blurry and confused.',
       };
     } finally {
       if (session) {
