@@ -1,30 +1,33 @@
 'use client';
-// Vendor
-import * as React from 'react';
-import { createTheme, NextUIProvider } from '@nextui-org/react';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
-// Components
-import MainComponent from './chat/Main';
 
-export default function App() {
-  const lightTheme = createTheme({
-    type: 'light',
-  });
+import { ReactElement, useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { Chat } from '@components/chat/Chat';
+import NavBar from '@components/navbar/NavBar';
+import { getNameFromUser } from '@utils/main.utils';
+import { HeroUIProvider, useDisclosure } from '@heroui/react';
+import { LoginModal } from '@components/modal/LoginModal';
 
-  const darkTheme = createTheme({
-    type: 'dark',
-  });
+const MainComponent = (): ReactElement => {
+  const { user, isLoading } = useUser();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+  useEffect(() => {
+    user === undefined ? onOpen() : onClose();
+  }, [user, isLoading]);
+  console.log(isLoading);
+
   return (
-    <NextThemesProvider
-      defaultTheme="dark"
-      attribute="class"
-      value={{
-        light: lightTheme.className,
-        dark: darkTheme.className,
-      }}>
-      <NextUIProvider>
-        <MainComponent />
-      </NextUIProvider>
-    </NextThemesProvider>
+    <HeroUIProvider>
+      <div className="main-wrapper block ">
+        <div className="main-container dark flex flex-col items-center justify-center">
+          <NavBar />
+          {!isLoading && user && <Chat username={getNameFromUser(user)} />}
+        </div>
+        <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
+      </div>
+    </HeroUIProvider>
   );
-}
+};
+
+export default MainComponent;

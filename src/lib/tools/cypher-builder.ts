@@ -41,7 +41,7 @@ export const cypherBuilderTool: Tool = {
         "reaction": "Missing information that you can suggest to the other AI so it can ask"
         } 
 
-        Do not include any other suggetions o comments in the Cypher, and dont response with MDX, only in flat JSON
+      Do not include any other suggetions o comments in the Cypher, and dont response with MDX, only in flat JSON
 `;
 
       const { steps } = await generateText({

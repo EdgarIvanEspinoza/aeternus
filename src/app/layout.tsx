@@ -1,8 +1,6 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
-
-const inter = Inter({ subsets: ['latin'] });
+import { Providers } from './providers';
 
 export const metadata = {
   title: '🐲Aeternus AI',
@@ -11,10 +9,10 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <UserProvider>
-        <body className={inter.className}>{children}</body>
-      </UserProvider>
-    </html>
+    <Providers>
+      <html lang="es">
+        <body className={'dark text-foreground bg-background'}>{children}</body>
+      </html>
+    </Providers>
   );
 }
