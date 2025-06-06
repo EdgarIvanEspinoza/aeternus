@@ -3,7 +3,12 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { UserSection } from './UserSection';
 import { AeternusTitle } from './Title';
 
-const NavbarComponent = () => {
+type Props = {
+  adminMode: boolean;
+  setAdminMode: (adminMode: boolean) => void;
+};
+
+const NavbarComponent = ({ adminMode, setAdminMode }: Props) => {
   const { user } = useUser();
 
   return (
@@ -12,7 +17,7 @@ const NavbarComponent = () => {
         <AeternusTitle>Aeternus</AeternusTitle>
       </NavbarBrand>
       <NavbarContent justify="end">
-        <UserSection user={user} />
+        <UserSection user={user} adminMode={adminMode} setAdminMode={setAdminMode} />
       </NavbarContent>
     </Navbar>
   );

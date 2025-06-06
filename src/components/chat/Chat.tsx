@@ -2,11 +2,17 @@ import React, { useEffect, useRef } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
 import { ChatMessage } from './ChatMessage/ChatMessage';
-import { useNotification } from 'Providers/ToolNotification';
+import { addToast } from '@heroui/react';
+import { Wrench } from 'lucide-react';
 
-export const Chat = ({ username }: { username: string | null | undefined }): React.ReactElement => {
+export const Chat = ({
+  username,
+  adminMode,
+}: {
+  username: string | null | undefined;
+  adminMode: boolean;
+}): React.ReactElement => {
   const { messages, input, handleInputChange, handleSubmit } = ChatHook(username);
-  const { addNotification } = useNotification();
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -21,16 +27,40 @@ export const Chat = ({ username }: { username: string | null | undefined }): Rea
   // }, []);
 
   useEffect(() => {
-    const evtSource = new EventSource('/api/notifications');
+    if (adminMode) {
+      const evtSource = new EventSource('/api/notifications');
+      console.log('Notifications ON');
 
-    evtSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      addNotification(`${data.cypher}\n${data.purpose}\n${data.reaction}`);
-    };
+      evtSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // (`${data.cypher}\n${data.purpose}\n${data.reaction}`);
+        console.log('Notification sent');
+        const toasts = [
+          {
+            title: 'Cypher Builder Tool',
+            description: `Reaction: ${data.reaction}`,
+          },
+          {
+            title: 'Cypher Builder Tool',
+            description: `Purpose: ${data.purpose}`,
+          },
+          {
+            title: 'Cypher Builder Tool',
+            description: `Cypher: ${data.cypher}`,
+          },
+        ];
 
-    return () => {
-      evtSource.close();
-    };
+        toasts.forEach((toast, index) => {
+          setTimeout(() => {
+            addToast(toast);
+          }, index * 100);
+        });
+      };
+
+      return () => {
+        evtSource.close();
+      };
+    }
   }, []);
 
   useEffect(() => {

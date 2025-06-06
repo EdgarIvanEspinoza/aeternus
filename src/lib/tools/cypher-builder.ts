@@ -63,9 +63,9 @@ export const cypherBuilderTool: Tool = {
       session = driver.session();
       await session.run(parsed.cypher);
       notificationEmitter.emit('notify', {
-        cypher: `Cypher: ${parsed.cypher}`,
-        purpose: `Purpose: ${parsed.purpose}`,
-        reaction: `Suggestion: ${parsed.reaction}`,
+        cypher: `${parsed.cypher}`,
+        purpose: `${parsed.purpose}`,
+        reaction: `${parsed.reaction}`,
       });
       return { text: parsed.reaction };
     } catch (error) {
