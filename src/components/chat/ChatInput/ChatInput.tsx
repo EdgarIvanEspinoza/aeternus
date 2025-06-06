@@ -12,7 +12,7 @@ const ChatInput = ({
   handleInputChange: any;
 }): React.ReactElement => {
   return (
-    <div className="w-full mb-4 flex flex-col items-center">
+    <div className="w-full mb-4 flex flex-col items-center self-end">
       <form onSubmit={handleSubmit} className="w-[80%]">
         <Input
           placeholder="Escribe y recibe sabiduría..."
@@ -22,6 +22,7 @@ const ChatInput = ({
           aria-label="Escribe tu mensaje aquí"
           fullWidth
           size="lg"
+          type="text"
           endContent={
             <div className="m-auto">
               <Button

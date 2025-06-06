@@ -6,7 +6,6 @@ import { ChatMessage } from './ChatMessage/ChatMessage';
 
 export const Chat = ({ username }: { username: string | null | undefined }): React.ReactElement => {
   const { messages, input, handleInputChange, handleSubmit } = ChatHook(username);
-  const { user, isLoading } = useUser();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // useEffect(() => {
@@ -25,7 +24,7 @@ export const Chat = ({ username }: { username: string | null | undefined }): Rea
 
   return (
     <>
-      <div className="flex flex-col my-10 mx-auto pb-[50px] w-[70vw] h-[100vh] max-h-[70vh] overflow-y-auto">
+      <div className="flex flex-col dark flex-1 pb-10 w-[80%] bg-background">
         {messages
           .slice(1)
           .filter((msg) => msg.role !== 'system')
@@ -39,7 +38,9 @@ export const Chat = ({ username }: { username: string | null | undefined }): Rea
           ))}
         <div ref={messagesEndRef} />
       </div>
-      <ChatInputComponent {...{ handleSubmit, input, handleInputChange }} />
+      <div className="sticky bottom-0 z-10 bg-background w-full mt-4">
+        <ChatInputComponent {...{ handleSubmit, input, handleInputChange }} />
+      </div>
     </>
   );
 };

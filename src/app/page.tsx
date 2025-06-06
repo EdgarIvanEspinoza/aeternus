@@ -19,13 +19,13 @@ const MainComponent = (): ReactElement => {
 
   return (
     <HeroUIProvider>
-      <div className="main-wrapper block ">
-        <div className="main-container dark flex flex-col items-center justify-center">
-          <NavBar />
+      <div className="min-h-screen flex flex-col">
+        <NavBar />
+        <main className="flex-1 dark flex flex-col items-center bg-background">
           {!isLoading && user && <Chat username={getNameFromUser(user)} />}
-        </div>
-        <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
+        </main>
       </div>
+      <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </HeroUIProvider>
   );
 };
