@@ -1,5 +1,5 @@
+import { HeroUIProvider } from '@heroui/react';
 import './globals.css';
-import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 
 export const metadata = {
@@ -9,10 +9,10 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Providers>
-      <html lang="es">
-        <body className={'dark text-foreground bg-background'}>{children}</body>
-      </html>
-    </Providers>
+    <html lang="es">
+      <body className={'dark text-foreground bg-background'}>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }

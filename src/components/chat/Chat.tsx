@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { ChatMessage } from './ChatMessage/ChatMessage';
+import { useNotification } from 'Providers/ToolNotification';
 
 export const Chat = ({ username }: { username: string | null | undefined }): React.ReactElement => {
   const { messages, input, handleInputChange, handleSubmit } = ChatHook(username);
+  const { addNotification } = useNotification();
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // useEffect(() => {
@@ -17,6 +19,19 @@ export const Chat = ({ username }: { username: string | null | undefined }): Rea
   //     });
   //   }
   // }, []);
+
+  useEffect(() => {
+    const evtSource = new EventSource('/api/notifications');
+
+    evtSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      addNotification(`${data.cypher}\n${data.purpose}\n${data.reaction}`);
+    };
+
+    return () => {
+      evtSource.close();
+    };
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
