@@ -40,7 +40,6 @@ const ChatInput = ({
           }
         />
       </form>
-      <p style={{ color: '#333', margin: '1rem 0rem', textAlign: 'center' }}>Eres libre de escribir lo que quieras.</p>
     </div>
   );
 };

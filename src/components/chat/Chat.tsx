@@ -67,7 +67,7 @@ export const Chat = ({
 
   return (
     <>
-      <div className="flex flex-col dark flex-1 pb-10 w-[80%] bg-background">
+      <div className="flex flex-col justify-end dark flex-1 pb-10 w-[80%] bg-background">
         {messages
           .slice(1)
           .filter((msg) => msg.role !== 'system')
