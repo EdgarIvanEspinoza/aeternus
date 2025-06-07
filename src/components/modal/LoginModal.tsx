@@ -14,6 +14,10 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
     });
   }, []);
 
+  const handlerLoginButton = (): any => {
+    window.location.href = '/api/auth/login';
+  };
+
   const { isLoading, error } = useUser();
 
   return (
@@ -51,8 +55,8 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
                     fullWidth
                     color={'primary'}
                     className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg mt-4"
-                    href="/api/auth/login"
                     onPress={() => {
+                      handlerLoginButton();
                       onClose();
                     }}>
                     <span className="text-[18px] font-bold">Iniciar sesión</span>
