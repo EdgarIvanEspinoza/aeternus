@@ -29,7 +29,11 @@ const ChatInput = ({
                 isIconOnly
                 aria-label="Send message"
                 className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                radius="full">
+                radius="full"
+                onPress={() => {
+                  const form = document.querySelector('form');
+                  form && form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }}>
                 <Send size={20} />
               </Button>
             </div>

@@ -29,12 +29,10 @@ export const Chat = ({
   useEffect(() => {
     if (adminMode) {
       const evtSource = new EventSource('/api/notifications');
-      console.log('Notifications ON');
 
       evtSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
         // (`${data.cypher}\n${data.purpose}\n${data.reaction}`);
-        console.log('Notification sent');
         const toasts = [
           {
             title: 'Cypher Builder Tool',

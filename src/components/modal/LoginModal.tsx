@@ -54,6 +54,7 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
                   <Button
                     fullWidth
                     color={'primary'}
+                    className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg mt-4"
                     onPress={() => {
                       handlerLoginButton();
                       onClose();
@@ -64,7 +65,9 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
               )}
             </ModalBody>
             <ModalFooter>
-              <Link href="/policies">Términos y condiciones</Link>
+              <Link href="/policies" color="warning">
+                Términos y condiciones
+              </Link>
             </ModalFooter>
           </>
         )}
