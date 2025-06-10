@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
-import { cypherBuilderTool } from '@lib/tools/cypher-builder';
+// import { cypherBuilderTool } from '@lib/tools/cypher-builder';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     messages,
     tools: {
       web_search_preview: openai.tools.webSearchPreview(),
-      cypher_builder: cypherBuilderTool,
+      // cypher_builder: cypherBuilderTool,
     },
     maxSteps: 3,
     maxTokens: 5000, // Maximo de tokens a devolver
