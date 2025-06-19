@@ -31,6 +31,8 @@
     "openai": "^4.96.2",
     "postcss": "8.4.24",
     "prisma": "^6.7.0",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "10.1.0",

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
 import { ChatMessage } from './ChatMessage/ChatMessage';
-import { addToast } from '@heroui/react';
-import { Wrench } from 'lucide-react';
+// import { addToast } from '@heroui/react';
+// import pusherClient from '@lib/events/notifications';
 
 export const Chat = ({
   username,
@@ -26,40 +26,38 @@ export const Chat = ({
   //   }
   // }, []);
 
-  useEffect(() => {
-    if (adminMode) {
-      const evtSource = new EventSource('/api/notifications');
+  // useEffect(() => {
+  //   if (adminMode) {
+  //     const channel = pusherClient.subscribe('aeternus');
 
-      evtSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        // (`${data.cypher}\n${data.purpose}\n${data.reaction}`);
-        const toasts = [
-          {
-            title: 'Cypher Builder Tool',
-            description: `Reaction: ${data.reaction}`,
-          },
-          {
-            title: 'Cypher Builder Tool',
-            description: `Purpose: ${data.purpose}`,
-          },
-          {
-            title: 'Cypher Builder Tool',
-            description: `Cypher: ${data.cypher}`,
-          },
-        ];
+  //     channel.bind('cypher-tool-notification', (data: { reaction: string; purpose: string; cypher: string }) => {
+  //       const toasts = [
+  //         {
+  //           title: 'Cypher Builder Tool',
+  //           description: `Reaction: ${data.reaction}`,
+  //         },
+  //         {
+  //           title: 'Cypher Builder Tool',
+  //           description: `Purpose: ${data.purpose}`,
+  //         },
+  //         {
+  //           title: 'Cypher Builder Tool',
+  //           description: `Cypher: ${data.cypher}`,
+  //         },
+  //       ];
 
-        toasts.forEach((toast, index) => {
-          setTimeout(() => {
-            addToast(toast);
-          }, index * 100);
-        });
-      };
+  //       toasts.forEach((toast, index) => {
+  //         setTimeout(() => {
+  //           addToast(toast);
+  //         }, index * 100);
+  //       });
+  //     });
 
-      return () => {
-        evtSource.close();
-      };
-    }
-  }, []);
+  //     return () => {
+  //       pusherClient.unsubscribe('cypher-builder-tool');
+  //     };
+  //   }
+  // }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,8 +67,8 @@ export const Chat = ({
     <>
       <div className="flex flex-col justify-end dark flex-1 pb-10 w-[80%] bg-background">
         {messages
-          .slice(1)
-          .filter((msg) => msg.role !== 'system')
+          // .slice(1)
+          // .filter((msg) => msg.role !== 'system')
           .map((message) => (
             <ChatMessage
               key={message.id}

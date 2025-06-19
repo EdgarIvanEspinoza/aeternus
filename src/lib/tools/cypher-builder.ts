@@ -4,7 +4,16 @@ import { openai } from '@ai-sdk/openai';
 import { checkIfUserExists } from '../neo4j/checkIfUserExists';
 import { getExampleNode } from '../neo4j/getExampleNode';
 import driver from '../neo4j/driver';
-import { notificationEmitter } from '@lib/events/notifications';
+
+var Pusher = require('pusher');
+
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_APP_KEY,
+  secret: process.env.PUSHER_APP_SECRET,
+  cluster: process.env.PUSHER_APP_CLUSTER,
+  useTLS: true,
+});
 
 export const cypherBuilderTool: Tool = {
   description:
@@ -62,11 +71,13 @@ export const cypherBuilderTool: Tool = {
 
       session = driver.session();
       await session.run(parsed.cypher);
-      notificationEmitter.emit('notify', {
+
+      pusher.trigger('aeternus', 'cypher-tool-notification', {
         cypher: `${parsed.cypher}`,
         purpose: `${parsed.purpose}`,
         reaction: `${parsed.reaction}`,
       });
+
       return { text: parsed.reaction };
     } catch (error) {
       console.error('Error in cypherBuilderTool.execute:', error);
