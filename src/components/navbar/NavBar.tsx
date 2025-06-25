@@ -3,35 +3,42 @@ import {
   NavbarBrand,
   NavbarContent,
   Avatar,
-  Button,
   Link,
   NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenuItem,
-  NavbarMenu,
   Switch,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
-  User,
 } from '@heroui/react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { UserSection } from './UserSection';
 import { AeternusTitle } from './Title';
 import { useState } from 'react';
 import { checkUserIsAdmin } from '@utils/main.utils';
-import { PlusIcon } from 'lucide-react';
+import { Delete } from 'lucide-react';
+import { ResetConversationButton } from './DeleteConversationButton';
 
 type Props = {
   adminMode: boolean;
+  jacquesMode: boolean;
   setAdminMode: (adminMode: boolean) => void;
+  setJacquesMode: (jacquesMode: boolean) => void;
 };
 
-const NavbarComponent = ({ adminMode, setAdminMode }: Props) => {
+const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode }: Props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useUser();
+
+  const handleJacquesMode = () => {
+    localStorage.setItem('jacquesMode', JSON.stringify(!jacquesMode));
+    setJacquesMode(!jacquesMode);
+  };
+
+  const handleAdminMode = () => {
+    localStorage.setItem('adminMode', JSON.stringify(!adminMode));
+    setAdminMode(!adminMode);
+  };
 
   return (
     <Navbar isBordered className="px-6 py-3 shadow-md backdrop-blur-sm bg-opacity-90" onMenuOpenChange={setIsMenuOpen}>
@@ -42,7 +49,7 @@ const NavbarComponent = ({ adminMode, setAdminMode }: Props) => {
         <Dropdown
           showArrow
           classNames={{
-            base: 'before:bg-default-200', // change arrow background
+            base: 'before:bg-default-200',
             content: 'p-0 border-small border-divider bg-background',
           }}
           radius="sm"
@@ -69,12 +76,19 @@ const NavbarComponent = ({ adminMode, setAdminMode }: Props) => {
             {checkUserIsAdmin(user?.email || '') ? (
               <DropdownSection aria-label="Admin Mode">
                 <DropdownItem
-                  key="new_project"
+                  key="admin_mode"
                   closeOnSelect={false}
-                  endContent={
-                    <Switch isSelected={adminMode} color="success" onValueChange={() => setAdminMode(!adminMode)} />
-                  }>
+                  endContent={<Switch isSelected={adminMode} color="success" onValueChange={handleAdminMode} />}>
                   Admin mode
+                </DropdownItem>
+                <DropdownItem
+                  key="jacques_mode"
+                  closeOnSelect={false}
+                  endContent={<Switch isSelected={jacquesMode} color="success" onValueChange={handleJacquesMode} />}>
+                  Jacques mode
+                </DropdownItem>
+                <DropdownItem key={'reset_conversation'} className="flex items-center gap-2">
+                  <ResetConversationButton />
                 </DropdownItem>
               </DropdownSection>
             ) : null}

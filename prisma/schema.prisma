@@ -12,8 +12,8 @@ model User {
   name      String
   email     String    @unique
   picture   String?
-  messages  Message[]
   createdAt DateTime  @default(now())
+  messages  Message[]
 }
 
 model Message {
@@ -23,4 +23,13 @@ model Message {
   timestamp DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  userId         String
+  role           String
+  content        String
+  createdAt      DateTime @default(now())
+  conversationId String
 }
