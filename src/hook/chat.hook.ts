@@ -14,6 +14,7 @@ const ChatHook = (
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   append: (message: Message) => void;
   loading: boolean;
+  savingMessages: boolean;
 } => {
   const conversationId = useRef(localStorage.getItem('conversationId') || uuidv4());
   localStorage.setItem('conversationId', conversationId.current);
@@ -21,19 +22,27 @@ const ChatHook = (
   const { user } = useUser();
   const [initialMessages, setInitialMessages] = useState<Message[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [savingMessages, setSavingMessages] = useState(false);
 
   const saveMessage = async (role: 'user' | 'assistant' | 'system', content: string) => {
     if (!user?.sub) return;
-    await fetch('/api/chat/saveMessage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: user.sub,
-        conversationId: conversationId.current,
-        role,
-        content,
-      }),
-    });
+    setSavingMessages(true);
+    try {
+      await fetch('/api/chat/saveMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.sub,
+          conversationId: conversationId.current,
+          role,
+          content,
+        }),
+      });
+    } catch (err) {
+      console.error('Error saving message:', err);
+    } finally {
+      setSavingMessages(false);
+    }
   };
 
   const fetchTraits = async () => {
@@ -113,7 +122,7 @@ const ChatHook = (
     e.preventDefault();
     if (!input.trim()) return;
     await saveMessage('user', input);
-    handleSubmit(e); // lanza a la IA
+    handleSubmit(e);
   };
 
   return {
@@ -123,6 +132,7 @@ const ChatHook = (
     handleSubmit: wrappedHandleSubmit,
     append,
     loading,
+    savingMessages,
   };
 };
 

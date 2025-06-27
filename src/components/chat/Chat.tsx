@@ -12,7 +12,7 @@ export const Chat = ({
   username: string | null | undefined;
   adminMode: boolean;
 }): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit, loading } = ChatHook(username);
+  const { messages, input, handleInputChange, handleSubmit, loading, savingMessages } = ChatHook(username);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -77,7 +77,7 @@ export const Chat = ({
         </div>
       )}
       <div className="sticky bottom-0 z-10 bg-background w-full mt-4">
-        <ChatInputComponent {...{ handleSubmit, input, handleInputChange }} />
+        <ChatInputComponent disabled={savingMessages} {...{ handleSubmit, input, handleInputChange }} />
       </div>
     </>
   );

@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { graphRelationshipAnalyzerTool } from '@lib/tools/graphRelationshipAnalyzerTools';
 import { streamText } from 'ai';
 // import { cypherBuilderTool } from '@lib/tools/cypher-builder';
 
@@ -11,6 +12,7 @@ export async function POST(req: Request) {
     tools: {
       web_search_preview: openai.tools.webSearchPreview(),
       // cypher_builder: cypherBuilderTool,
+      graphRelationshipAnalyzerTool: graphRelationshipAnalyzerTool,
     },
     maxSteps: 3,
     maxTokens: 4096, // Maximo de tokens a devolver
