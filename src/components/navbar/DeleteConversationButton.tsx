@@ -22,7 +22,7 @@ export const ResetConversationButton = () => {
       if (!res.ok) throw new Error(data.error);
 
       setDone(true);
-      window.location.reload(); // o también puedes limpiar el state manualmente
+      window.location.reload();
     } catch (err) {
       console.error('Error resetting conversation:', err);
     } finally {
@@ -31,7 +31,7 @@ export const ResetConversationButton = () => {
   };
 
   return (
-    <Button onPress={handleReset} variant="flat" color="danger" className="hidden md:inline-flex" disabled={loading}>
+    <Button onPress={handleReset} variant="flat" color="danger" disabled={loading}>
       {loading ? 'Borrando...' : done ? 'Reiniciado' : 'Reiniciar conversación'}
     </Button>
   );

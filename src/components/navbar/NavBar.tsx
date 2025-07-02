@@ -16,8 +16,8 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { AeternusTitle } from './Title';
 import { useState } from 'react';
 import { checkUserIsAdmin } from '@utils/main.utils';
-import { Delete } from 'lucide-react';
 import { ResetConversationButton } from './DeleteConversationButton';
+import { CloseSessionButton } from './CloseSessionButton';
 
 type Props = {
   adminMode: boolean;
@@ -89,6 +89,9 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 </DropdownItem>
                 <DropdownItem key={'reset_conversation'} className="flex items-center gap-2">
                   <ResetConversationButton />
+                </DropdownItem>
+                <DropdownItem key={'close_session'} className="flex items-center gap-2">
+                  <CloseSessionButton />
                 </DropdownItem>
               </DropdownSection>
             ) : null}
