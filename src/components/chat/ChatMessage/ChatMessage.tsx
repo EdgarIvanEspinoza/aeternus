@@ -13,19 +13,43 @@ const gradientText = (gradient: string) => ({
 
 export const ChatMessage = ({
   message,
-  isAssistant,
+  role,
   username,
 }: {
   message: any;
-  isAssistant: boolean;
+  role: 'data' | 'user' | 'assistant' | 'system';
   username: string | null | undefined;
 }) => {
   const [QuantumReady, setQuantumReady] = useState(false);
-
-  const roleLabel = isAssistant ? 'Aeternus 🐲' : `${username} 🧑‍💻`;
-  const gradient = isAssistant
-    ? 'linear-gradient(45deg, #2563eb -20%, #ec4899 50%)'
-    : 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
+  const isAssistant = role === 'assistant';
+  let roleLabel: string;
+  switch (role) {
+    case 'user':
+      roleLabel = username ? `${username} 🧑‍💻` : 'User';
+      break;
+    case 'assistant':
+      roleLabel = 'Aeternus 🐲';
+      break;
+    case 'system':
+      roleLabel = 'System';
+      break;
+    default:
+      roleLabel = 'Unknown Role';
+  }
+  let gradient = 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
+  switch (role) {
+    case 'assistant':
+      gradient = 'linear-gradient(45deg, #2563eb -20%, #ec4899 50%)';
+      break;
+    case 'user':
+      gradient = 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
+      break;
+    case 'system':
+      gradient = 'linear-gradient(45deg, #2563eb -20%, #ca8a04 50%)';
+      break;
+    default:
+      gradient = 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
+  }
 
   useEffect(() => {
     import('ldrs').then(({ quantum }) => {

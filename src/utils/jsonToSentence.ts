@@ -3,18 +3,20 @@ import { date } from 'zod';
 type Props = {
   abilities: string;
   animicState: string;
+  bestFriends: string[];
+  closeFamily: string[];
+  closeFriends: string[];
   dateOfBirth: string;
   dateOfDeath?: string;
+  healthCondition: string;
+  mainInterests: string;
+  relationships: { type: string; name: string }[];
+  rolCharacter: string;
+  traits: string;
+  userAnimicState: string;
   userDateOfBirth: string;
   userDateOfDeath?: string;
-  healthCondition: string;
-  bestFriends: string[];
-  closeFriends: string[];
-  closeFamily: string[];
-  userAnimicState: string;
   words: string;
-  relationships: { type: string; name: string }[];
-  mainInterests: string;
 };
 
 export const convertAgeToString = (
@@ -78,10 +80,9 @@ export const getConversationStyle = ({
     parentalRelationship?.type === 'BOYFRIEND' ||
     parentalRelationship?.type === 'CRUSH';
 
+  if (lovesSentimental && hasCloseRelations && romanticMood) return 'You are in a romantic and joking mood.';
   if (lovesSentimental && romanticMood) return 'You are in a romantic mood.';
   if (hasCloseRelations) return 'You are in a joking mood.';
-
-  if (lovesSentimental && romanticMood) return 'You are in a romantic and joking mood.';
 
   return 'You have a neutral conversation style.';
 };
@@ -103,23 +104,25 @@ export const getRespect = (aiAge: number, userAge: number): number => {
 };
 
 export const rawTraitsToPrompt = (dataArr: Props[]) => {
-  if (!Array.isArray(dataArr) || dataArr.length === 0) return 'No hay información disponible.';
+  if (!Array.isArray(dataArr) || dataArr.length === 0) return '';
 
   const {
     abilities,
     animicState,
+    bestFriends = [],
+    closeFamily = [],
+    closeFriends = [],
     dateOfBirth,
     dateOfDeath,
     healthCondition,
-    bestFriends = [],
-    closeFriends = [],
-    closeFamily = [],
+    mainInterests,
+    relationships = [],
+    rolCharacter,
+    traits,
+    userAnimicState,
     userDateOfBirth,
     userDateOfDeath,
-    userAnimicState,
     words,
-    relationships = [],
-    mainInterests,
   } = dataArr[0];
 
   return [
@@ -140,6 +143,8 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
         }`
       : '',
     mainInterests ? `Your main interests are: ${mainInterests}.` : '',
+    rolCharacter ? `Your role character is: ${rolCharacter}.` : '',
+    traits ? `Your traits are: ${traits}` : '',
   ]
 
     .filter(Boolean)
