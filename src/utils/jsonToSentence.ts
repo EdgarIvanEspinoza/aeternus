@@ -2,18 +2,19 @@ import { date } from 'zod';
 
 type Props = {
   abilities: string;
-  animic_state: string;
-  date_of_birth: string;
-  date_of_death?: string;
-  user_date_of_birth: string;
-  user_date_of_death?: string;
-  health_condition: string;
-  best_friends: string[];
-  close_friends: string[];
-  close_family: string[];
-  user_animic_state: string;
+  animicState: string;
+  dateOfBirth: string;
+  dateOfDeath?: string;
+  userDateOfBirth: string;
+  userDateOfDeath?: string;
+  healthCondition: string;
+  bestFriends: string[];
+  closeFriends: string[];
+  closeFamily: string[];
+  userAnimicState: string;
   words: string;
   relationships: { type: string; name: string }[];
+  mainInterests: string;
 };
 
 export const convertAgeToString = (
@@ -58,21 +59,21 @@ export const getConversationStyle = ({
   user_age: number;
 }): string => {
   if (relationships?.some((r) => r.type === 'Upset' && r.name === 'Animic_Towards')) {
-    return 'Tienes un estilo de conversación seco.';
+    return 'You have a Dry conversation style.';
   }
   if (animic_state === 'Bad') {
-    return 'Tienes un estilo de conversación serio.';
+    return 'You have a Serious conversation style.';
   }
   const lovesSentimental = relationships?.some((r) => r.type === 'LOVES' && r.name === 'Sentiment');
   const hasCloseRelations = relationships?.some((r) =>
     ['CLOSE_FRIEND', 'BEST_FRIEND', 'CLOSE_FAMILY'].includes(r.type)
   );
 
-  if (lovesSentimental && hasCloseRelations) return 'Estás de humor romántico y bromista.';
-  if (lovesSentimental) return 'Estás de humor romántico.';
-  if (hasCloseRelations) return 'Estás de humor bromista.';
+  if (lovesSentimental && hasCloseRelations) return 'You are in a romantic and joking mood.';
+  if (lovesSentimental) return 'You are in a romantic mood.';
+  if (hasCloseRelations) return 'You are in a joking mood.';
 
-  return 'Tu estilo de conversación es neutral.';
+  return 'You have a neutral conversation style.';
 };
 
 export const getParentalRealtionship = (relationships: Props['relationships']): string | undefined => {
@@ -96,24 +97,24 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
 
   const {
     abilities,
-    animic_state: animicState,
-    date_of_birth: dateOfBirth,
-    date_of_death: dateOfDeath,
-    health_condition: healthCondition,
-    best_friends: bestFriends = [],
-    close_friends: closeFriends = [],
-    close_family: closeFamily = [],
-    user_date_of_birth: userDateOfBirth,
-    user_date_of_death: userDateOfDeath,
-    user_animic_state: userAnimicState,
+    animicState,
+    dateOfBirth,
+    dateOfDeath,
+    healthCondition,
+    bestFriends = [],
+    closeFriends = [],
+    closeFamily = [],
+    userDateOfBirth,
+    userDateOfDeath,
+    userAnimicState,
     words,
     relationships = [],
+    mainInterests,
   } = dataArr[0];
 
   return [
     abilities ? `your abilities are: ${abilities},` : '',
     animicState ? `your current animic state is ${animicState},` : '',
-    dateOfBirth ? `your age is ${getCurrentAge(dateOfBirth, dateOfDeath)} years,` : '',
     healthCondition ? `your current health condition is: ${healthCondition},` : '',
     bestFriends.length > 0 ? `your best friends are: ${bestFriends.join(', ')},` : '',
     closeFriends.length > 0 ? `your close friends are: ${closeFriends.join(', ')},` : '',
@@ -128,6 +129,7 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
           userDateOfBirth ? `and the User is ${getCurrentAge(userDateOfBirth, userDateOfDeath)} years old.` : '.'
         }`
       : '',
+    mainInterests ? `Your main interests are: ${mainInterests}.` : '',
   ]
 
     .filter(Boolean)

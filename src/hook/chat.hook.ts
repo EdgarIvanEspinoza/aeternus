@@ -96,7 +96,7 @@ const ChatHook = (
           role: 'system',
           content: `
             ${config.ROL_CONFIG}
-            ${config.PERSONALITY_CARACTERISTICS}
+            ${config.PERSONALITY_CHARACTERISTICS}
             ${rawTraitsToPrompt(traits)}
             ${config.CONVERSATION_STYLE} ${getConversationStyle({
             animic_state: traits[0]?.animic_state,

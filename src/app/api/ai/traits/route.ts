@@ -22,21 +22,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         OPTIONAL MATCH (p)-[r]->(n)
         WITH p, n, collect(r) AS relationships
 
-        OPTIONAL MATCH (p)-[:Best_Friend]->(a)
+        OPTIONAL MATCH (p)-[:BEST_FRIEND]->(a)
         WITH p, n, relationships, collect(a.name) AS bestFriends
 
-        OPTIONAL MATCH (p)-[:Close_Friend]->(b)
+        OPTIONAL MATCH (p)-[:CLOSE_FRIEND]->(b)
         WITH p, n, relationships, bestFriends, collect(b.name) AS closeFriends
 
-        OPTIONAL MATCH (p)-[:Close_Family]->(c)
+        OPTIONAL MATCH (p)-[:CLOSE_FAMILY]->(c)
         WITH p, n, relationships, bestFriends, closeFriends, collect(c.name) AS closeFamily
 
 
         RETURN {
             abilities: p.ability,
-            date_of_birth: p.dateOfBirth,
-            date_of_death: p.dateOfDeath,
-            health_condition: p.specialCondition,
+            dateOfBirth: p.dateOfBirth,
+            dateOfDeath: p.dateOfDeath,
+            healthCondition: p.specialCondition,
             traits: p.traits,
             profession: p.profession,
             job: p.job,
@@ -53,15 +53,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             rutine: p.rutine,
             animicState: p.animicState,
             animicStateSource: p.animicStateSource,
-            mainInterest: p.mainInterest,
+            mainInterests: p.mainInterests,
             credibility: p.credibility,
             credulity: p.credulity,
             location: p.location,
-            user_date_of_birth: n.dateOfBirth,
-            user_date_of_death: n.dateOfDeath,
-            best_friends: bestFriends,
-            close_friends: closeFriends,
-            close_family: closeFamily,
+            userDateOfBirth: n.dateOfBirth,
+            userDateOfDeath: n.dateOfDeath,
+            bestFriends: bestFriends,
+            closeFriends: closeFriends,
+            closeFamily: closeFamily,
             relationships: relationships
         } AS activeAIProfile
       `);
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
         // 🎯 Calcular romantic
         const romanticTypes = ['love', 'wife', 'husband', 'bride', 'groom', 'girlfriend', 'boyfriend', 'crush'];
-        const jokingTypes = ['close_family', 'close_friends', 'best_friends'];
+        const jokingTypes = ['closeFamily', 'closeFriends', 'bestFriends'];
         const hasRelationship = (types: string[]) =>
           node.relationships.some((rel: any) => types.includes(rel.type.toLowerCase()));
 
@@ -105,10 +105,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           (toNumber(node.intelligence ?? 0) - toNumber(node.user_intelligence ?? 0)).toFixed(2)
         );
         // 📅 Formatear fechas
-        node.date_of_birth = convertAgeToString(node.date_of_birth);
-        node.date_of_death = node.date_of_death ? convertAgeToString(node.date_of_death) : undefined;
-        node.user_date_of_birth = convertAgeToString(node.user_date_of_birth);
-        node.user_date_of_death = node.user_date_of_death ? convertAgeToString(node.user_date_of_death) : undefined;
+        node.dateOfBirth = convertAgeToString(node.dateOfBirth);
+        node.dateOfDeath = node.dateOfDeath ? convertAgeToString(node.dateOfDeath) : undefined;
+        node.userDateOfBirth = convertAgeToString(node.userDateOfBirth);
+        node.userDateOfDeath = node.userDateOfDeath ? convertAgeToString(node.userDateOfDeath) : undefined;
 
         // 💖 Clasificación relacional
         const sentimentalRelations = ['girlfriend', 'boyfriend', 'crush'];
