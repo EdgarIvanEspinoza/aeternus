@@ -88,17 +88,27 @@ const ChatHook = (
       }
 
       if (messages.length === 0) {
+        const aiAge = getCurrentAge(traits[0]?.date_of_birth, traits[0]?.date_of_death);
+        const userAge = getCurrentAge(traits[0]?.user_date_of_birth, traits[0]?.user_date_of_death);
+
         const initialPrompt: Message = {
           id: 'system-init',
           role: 'system',
-          content: `${config.ROL_CONFIG} ${config.PERSONALITY_CARACTERISTICS} ${rawTraitsToPrompt(traits)} ${
-            config.CONVERSATION_STYLE
-          } ${getConversationStyle({
+          content: `
+            ${config.ROL_CONFIG}
+            ${config.PERSONALITY_CARACTERISTICS}
+            ${rawTraitsToPrompt(traits)}
+            ${config.CONVERSATION_STYLE} ${getConversationStyle({
             animic_state: traits[0]?.animic_state,
             relationships: traits[0]?.relationships,
-            age: getCurrentAge(traits[0]?.date_of_birth, traits[0]?.date_of_death),
-            user_age: getCurrentAge(traits[0]?.user_date_of_birth, traits[0]?.user_date_of_death),
-          })} ${config.CHARACTER_STYLE} ${config.INITIAL_MESSAGE} ${username}`,
+            age: aiAge,
+            user_age: userAge,
+          })}
+
+${config.CHARACTER_STYLE}
+
+${config.INITIAL_MESSAGE} ${username}
+  `.trim(),
         };
         append(initialPrompt);
 

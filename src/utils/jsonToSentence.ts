@@ -5,6 +5,8 @@ type Props = {
   animic_state: string;
   date_of_birth: string;
   date_of_death?: string;
+  user_date_of_birth: string;
+  user_date_of_death?: string;
   health_condition: string;
   best_friends: string[];
   close_friends: string[];
@@ -20,7 +22,13 @@ export const convertAgeToString = (
     day: { low: number };
   } | null
 ): string => {
-  return date ? `${date.year.low}-${date.month.low}-${date.day.low}` : '';
+  if (!date) return '';
+
+  const year = date.year.low;
+  const month = String(date.month.low).padStart(2, '0');
+  const day = String(date.day.low).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 export const getCurrentAge = (dateOfBirth: string, dateOfDeath?: string): number => {
@@ -48,29 +56,22 @@ export const getConversationStyle = ({
   age: number;
   user_age: number;
 }): string => {
-  console.log('Calculating conversation style with:', { animic_state, relationships, age, user_age });
-  const response = [];
   if (relationships?.some((r) => r.type === 'Upset' && r.name === 'Animic_Towards')) {
-    return 'Dry';
+    return 'Tienes un estilo de conversación seco.';
   }
   if (animic_state === 'Bad') {
-    return 'Serious';
+    return 'Tienes un estilo de conversación serio.';
   }
-  if (relationships?.some((r) => r.type === 'Loves' && r.name === 'Sentimental')) {
-    if (
-      relationships?.some((r) => r.type === 'Close_Friend' || r.type === 'Best_Friend' || r.type === 'CLOSE_FAMILY')
-    ) {
-      return 'You have a Joking & Romantic mood';
-    }
-    return 'You are in a Romantic mood';
-  }
-  if (relationships?.some((r) => r.type === 'Close_Friend' || r.type === 'Best_Friend' || r.type === 'CLOSE_FAMILY')) {
-    if (relationships?.some((r) => r.type === 'Loves' && r.name === 'Sentimental')) {
-      return 'You have a Joking & Romantic mood';
-    }
-    return 'You have a Joking mood';
-  }
-  return 'Neutral';
+  const lovesSentimental = relationships?.some((r) => r.type === 'LOVES' && r.name === 'Sentiment');
+  const hasCloseRelations = relationships?.some((r) =>
+    ['CLOSE_FRIEND', 'BEST_FRIEND', 'CLOSE_FAMILY'].includes(r.type)
+  );
+
+  if (lovesSentimental && hasCloseRelations) return 'Estás de humor romántico y bromista.';
+  if (lovesSentimental) return 'Estás de humor romántico.';
+  if (hasCloseRelations) return 'Estás de humor bromista.';
+
+  return 'Tu estilo de conversación es neutral.';
 };
 
 export const getParentalRealtionship = (relationships: Props['relationships']): string | undefined => {
@@ -84,44 +85,52 @@ export const getParentalRealtionship = (relationships: Props['relationships']): 
   return undefined;
 };
 
-export const rawTraitsToPrompt = (dataArr: Props) => {
-  if (!Array.isArray(dataArr) || dataArr.length === 0) return 'No information available';
-  console.log('Data array:', dataArr);
+export const getRespect = (aiAge: number, userAge: number): number => {
+  if (aiAge < 15 || userAge <= aiAge) return 0;
+  return Math.min((userAge - aiAge) * 0.01, 1);
+};
+
+export const rawTraitsToPrompt = (dataArr: Props[]) => {
+  if (!Array.isArray(dataArr) || dataArr.length === 0) return 'No hay información disponible.';
+
   const {
     abilities,
     animic_state: animicState,
     date_of_birth: dateOfBirth,
     date_of_death: dateOfDeath,
     health_condition: healthCondition,
-    best_friends: bestFriends,
-    close_friends: closeFriends,
-    close_family: closeFamily,
+    best_friends: bestFriends = [],
+    close_friends: closeFriends = [],
+    close_family: closeFamily = [],
     user_date_of_birth: userDateOfBirth,
     user_date_of_death: userDateOfDeath,
     words,
-    relationships,
+    relationships = [],
   } = dataArr[0];
 
-  return [
-    abilities ? `your abilities are: ${abilities},` : '',
-    animicState ? `your current animic state is ${animicState},` : '',
-    dateOfBirth ? `your age is ${getCurrentAge(dateOfBirth, dateOfDeath)} years,` : '',
-    healthCondition ? `your current health condition is: ${healthCondition},` : '',
-    bestFriends.length > 0 ? `your best friends are: ${bestFriends.join(', ')},` : '',
-    closeFriends.length > 0 ? `your close friends are: ${closeFriends.join(', ')},` : '',
-    closeFamily.length > 0 ? `your close family are: ${closeFamily.join(', ')}` : '',
-    words ? `. This is your language style with the words to use or not use in a conversation: ${words}.` : '',
-    relationships?.length ? `${getParentalRealtionship(relationships)}.` : '',
-    dateOfBirth
-      ? `Take into account, in the style and subjects you speak, that you are ${getCurrentAge(
-          dateOfBirth,
-          dateOfDeath
-        )} years old ${
-          userDateOfBirth ? `and the User is ${getCurrentAge(userDateOfBirth, userDateOfDeath)} years old.` : '.'
-        }`
-      : '',
-  ]
+  const aiAge = getCurrentAge(dateOfBirth, dateOfDeath);
+  const userAge = getCurrentAge(userDateOfBirth, userDateOfDeath);
+  const respectLevel = getRespect(aiAge, userAge);
+  const parental = getParentalRealtionship(relationships);
 
-    .filter(Boolean)
-    .join(' ');
+  const traits: string[] = [];
+
+  if (abilities) traits.push(`Tus habilidades son: ${abilities}.`);
+  if (animicState) traits.push(`Tu estado anímico actual es: ${animicState}.`);
+  if (dateOfBirth) traits.push(`Tienes ${aiAge} años.`);
+  if (healthCondition) traits.push(`Tu condición de salud actual es: ${healthCondition}.`);
+  if (bestFriends.length > 0) traits.push(`Tus mejores amigos son: ${bestFriends.join(', ')}.`);
+  if (closeFriends.length > 0) traits.push(`Tus amigos cercanos son: ${closeFriends.join(', ')}.`);
+  if (closeFamily.length > 0) traits.push(`Tus familiares cercanos son: ${closeFamily.join(', ')}.`);
+  if (words) traits.push(`Este es tu estilo lingüístico, con palabras que debes usar o evitar: ${words}.`);
+  if (parental) traits.push(parental);
+
+  traits.push(`Ten en cuenta que tienes ${aiAge} años y el usuario tiene ${userAge} años.`);
+  if (respectLevel > 0) {
+    traits.push(
+      `Respetas al usuario con un nivel de ${respectLevel.toFixed(2)} (de 0 a 1) basado en la diferencia de edad.`
+    );
+  }
+
+  return traits.join(' ');
 };
