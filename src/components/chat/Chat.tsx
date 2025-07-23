@@ -66,12 +66,7 @@ export const Chat = ({
           {messages
             .filter((msg) => (adminMode ? true : msg.role !== 'system'))
             .map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                isAssistant={message.role === 'assistant'}
-                username={username}
-              />
+              <ChatMessage key={message.id} message={message} role={message.role} username={username} />
             ))}
           <div ref={messagesEndRef} />
         </div>
