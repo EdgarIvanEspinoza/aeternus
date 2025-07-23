@@ -58,20 +58,30 @@ export const getConversationStyle = ({
   age: number;
   user_age: number;
 }): string => {
-  if (relationships?.some((r) => r.type === 'Upset' && r.name === 'Animic_Towards')) {
+  if (relationships?.some((r) => r.type === 'UPSET' && r.name === 'ANIMIC_TOWARDS')) {
     return 'You have a Dry conversation style.';
   }
   if (animic_state === 'Bad') {
     return 'You have a Serious conversation style.';
   }
   const lovesSentimental = relationships?.some((r) => r.type === 'LOVES' && r.name === 'Sentiment');
+  const parentalRelationship = relationships?.find((r) => r.name === 'Parental');
   const hasCloseRelations = relationships?.some((r) =>
     ['CLOSE_FRIEND', 'BEST_FRIEND', 'CLOSE_FAMILY'].includes(r.type)
   );
+  const romanticMood =
+    parentalRelationship?.type === 'WIFE' ||
+    parentalRelationship?.type === 'HUSBAND' ||
+    parentalRelationship?.type === 'BRIDE' ||
+    parentalRelationship?.type === 'GROOM' ||
+    parentalRelationship?.type === 'GIRLFRIEND' ||
+    parentalRelationship?.type === 'BOYFRIEND' ||
+    parentalRelationship?.type === 'CRUSH';
 
-  if (lovesSentimental && hasCloseRelations) return 'You are in a romantic and joking mood.';
-  if (lovesSentimental) return 'You are in a romantic mood.';
+  if (lovesSentimental && romanticMood) return 'You are in a romantic mood.';
   if (hasCloseRelations) return 'You are in a joking mood.';
+
+  if (lovesSentimental && romanticMood) return 'You are in a romantic and joking mood.';
 
   return 'You have a neutral conversation style.';
 };
@@ -84,7 +94,7 @@ export const getParentalRealtionship = (relationships: Props['relationships']): 
       return `Take into account in the style and subjects you speak that the User is your ${parentalRelationship.type}`;
     }
   }
-  return undefined;
+  return '';
 };
 
 export const getRespect = (aiAge: number, userAge: number): number => {
