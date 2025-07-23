@@ -110,32 +110,26 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
     relationships = [],
   } = dataArr[0];
 
-  const aiAge = getCurrentAge(dateOfBirth, dateOfDeath);
-  const userAge = getCurrentAge(userDateOfBirth, userDateOfDeath);
-  const respectLevel = getRespect(aiAge, userAge);
-  const parental = getParentalRealtionship(relationships);
+  return [
+    abilities ? `your abilities are: ${abilities},` : '',
+    animicState ? `your current animic state is ${animicState},` : '',
+    dateOfBirth ? `your age is ${getCurrentAge(dateOfBirth, dateOfDeath)} years,` : '',
+    healthCondition ? `your current health condition is: ${healthCondition},` : '',
+    bestFriends.length > 0 ? `your best friends are: ${bestFriends.join(', ')},` : '',
+    closeFriends.length > 0 ? `your close friends are: ${closeFriends.join(', ')},` : '',
+    closeFamily.length > 0 ? `your close family are: ${closeFamily.join(', ')}` : '',
+    words ? `. This is your language style with the words to use or not use in a conversation: ${words}.` : '',
+    relationships?.length ? `${getParentalRealtionship(relationships)}.` : '',
+    dateOfBirth
+      ? `Take into account, in the style and subjects you speak, that you are ${getCurrentAge(
+          dateOfBirth,
+          dateOfDeath
+        )} years old ${
+          userDateOfBirth ? `and the User is ${getCurrentAge(userDateOfBirth, userDateOfDeath)} years old.` : '.'
+        }`
+      : '',
+  ]
 
-  const traits: string[] = [];
-
-  if (abilities) traits.push(`Tus habilidades son: ${abilities}.`);
-  if (animicState) traits.push(`Tu estado anímico actual es: ${animicState}.`);
-  if (dateOfBirth) traits.push(`Tienes ${aiAge} años.`);
-  if (healthCondition) traits.push(`Tu condición de salud actual es: ${healthCondition}.`);
-  if (bestFriends.length > 0) traits.push(`Tus mejores amigos son: ${bestFriends.join(', ')}.`);
-  if (closeFriends.length > 0) traits.push(`Tus amigos cercanos son: ${closeFriends.join(', ')}.`);
-  if (closeFamily.length > 0) traits.push(`Tus familiares cercanos son: ${closeFamily.join(', ')}.`);
-  if (words) traits.push(`Este es tu estilo lingüístico, con palabras que debes usar o evitar: ${words}.`);
-  if (parental) traits.push(parental);
-  if (userAnimicState === 'Bad') traits.push('Se solidario durante la conversación.');
-
-  traits.push(
-    `Ten en cuenta el estilo y los temas de los que hablas ya que tienes ${aiAge} años y el usuario tiene ${userAge} años.`
-  );
-  if (respectLevel > 0) {
-    traits.push(
-      `Respetas al usuario con un nivel de ${respectLevel.toFixed(2)} (de 0 a 1) basado en la diferencia de edad.`
-    );
-  }
-
-  return traits.join(' ');
+    .filter(Boolean)
+    .join(' ');
 };
