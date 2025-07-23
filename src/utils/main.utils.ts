@@ -7,4 +7,10 @@ const checkUserIsAdmin = (email: string): boolean => {
   return false;
 };
 
-export { checkUserIsAdmin, getNameFromUser };
+const toNumber = (val: any): number => {
+  if (typeof val === 'bigint') return Number(val);
+  if (val && typeof val === 'object' && 'low' in val) return val.low;
+  return Number(val);
+};
+
+export { checkUserIsAdmin, getNameFromUser, toNumber };
