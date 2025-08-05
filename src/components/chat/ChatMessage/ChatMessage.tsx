@@ -22,6 +22,7 @@ export const ChatMessage = ({
 }) => {
   const [QuantumReady, setQuantumReady] = useState(false);
   const isAssistant = role === 'assistant';
+  const isSystem = role === 'system';
   let roleLabel: string;
   switch (role) {
     case 'user':
@@ -69,7 +70,7 @@ export const ChatMessage = ({
         )}
       </div>
       <div className={baseMessageStyles} style={gradientText(gradient)}>
-        {isAssistant ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
+        {isAssistant || isSystem ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
       </div>
     </div>
   );

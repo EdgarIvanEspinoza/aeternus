@@ -8,7 +8,7 @@ type Props = {
   closeFriends: string[];
   dateOfBirth: string;
   dateOfDeath?: string;
-  healthCondition: string;
+  specialCondition: string;
   mainInterests: string;
   relationships: { type: string; name: string }[];
   rolCharacter: string;
@@ -114,7 +114,7 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
     closeFriends = [],
     dateOfBirth,
     dateOfDeath,
-    healthCondition,
+    specialCondition,
     mainInterests,
     relationships = [],
     rolCharacter,
@@ -128,7 +128,7 @@ export const rawTraitsToPrompt = (dataArr: Props[]) => {
   return [
     abilities ? `your abilities are: ${abilities},` : '',
     animicState ? `your current animic state is ${animicState},` : '',
-    healthCondition ? `your current health condition is: ${healthCondition},` : '',
+    specialCondition ? `your current health condition is: ${specialCondition},` : '',
     bestFriends.length > 0 ? `your best friends are: ${bestFriends.join(', ')},` : '',
     closeFriends.length > 0 ? `your close friends are: ${closeFriends.join(', ')},` : '',
     closeFamily.length > 0 ? `your close family are: ${closeFamily.join(', ')}` : '',

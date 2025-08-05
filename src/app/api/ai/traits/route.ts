@@ -47,8 +47,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             dateOfDeath: p.dateOfDeath,
             egocentric: p.egocentric,
             emotionalIntelligence: p.emotionalIntelligence,
+            gender: p.gender,
             gossip: p.gossip,
-            healthCondition: p.specialCondition,
             home: p.home,
             intelligence: p.intelligence,
             job: p.job,
@@ -59,9 +59,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             relationships: relationships,
             rolCharacter: p.rolCharacter,
             rutine: p.rutine,
+            specialCondition: p.specialCondition,
             traits: p.traits,
             userDateOfBirth: n.dateOfBirth,
             userDateOfDeath: n.dateOfDeath,
+            userAnimicState: n.animicState,
+            userAnimicStateSource: n.animicStateSource,
+            userMainInterests: n.mainInterests,
+            userIntelligence: n.intelligence,
+            userEmotionalIntelligence: n.emotionalIntelligence,
+            userCredibility: n.credibility,
             words: p.words
         } AS activeAIProfile
       `);
@@ -87,7 +94,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const joking = hasRelationship(jokingTypes);
 
         // 😐 Calcular serious
-        const serious = node.animicState === 'bad' || node.animicStateSource === 'bad';
+        const serious = node.animicState === 'Bad';
 
         // 😤 Calcular dry
         const dry = node.relationships.some((rel: any) => rel.type === 'ANGRY_ABOUT') || node.rutine === 'hurry';
