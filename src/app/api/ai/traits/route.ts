@@ -31,6 +31,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         OPTIONAL MATCH (p)-[:CLOSE_FAMILY]->(c)
         WITH p, n, relationships, bestFriends, closeFriends, collect(c.name) AS closeFamily
 
+        OPTIONAL MATCH (p)-[:LOVES]->(c)
+        WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
 
         RETURN {
             abilities: p.abilities,
@@ -42,7 +44,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             closeFriends: closeFriends,
             credibility: p.credibility,
             credulity: p.credulity,
-            curious: p.curious,
+            curiosity: p.curiosity,
             dateOfBirth: p.dateOfBirth,
             dateOfDeath: p.dateOfDeath,
             egocentric: p.egocentric,
@@ -69,7 +71,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userIntelligence: n.intelligence,
             userEmotionalIntelligence: n.emotionalIntelligence,
             userCredibility: n.credibility,
-            words: p.words
+            words: p.words,
+            loves: loves
         } AS activeAIProfile
       `);
 
