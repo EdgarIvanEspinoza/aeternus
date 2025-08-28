@@ -4,7 +4,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Chat } from '@components/chat/Chat';
 import NavBar from '@components/navbar/NavBar';
-import { getNameFromUser } from '@utils/main.utils';
+import { getNameAndFamilyFromUser } from '@utils/main.utils';
 import { useDisclosure } from '@heroui/react';
 import { LoginModal } from '@components/modal/LoginModal';
 
@@ -50,7 +50,7 @@ const MainComponent = (): ReactElement => {
         />
         <main className="flex-1 dark flex flex-col items-center bg-background">
           {!isLoading && user && (
-            <Chat username={jacquesMode ? 'Jacques Schwartzman' : getNameFromUser(user)} adminMode={adminMode} />
+            <Chat username={jacquesMode ? 'Jacques Schwartzman' : getNameAndFamilyFromUser(user)} adminMode={adminMode} />
           )}
         </main>
       </div>

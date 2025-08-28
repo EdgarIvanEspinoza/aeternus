@@ -1,4 +1,8 @@
 const getNameFromUser = (user: any): string => {
+  return user?.given_name ? user.given_name : user?.name;
+};
+
+const getNameAndFamilyFromUser = (user: any): string => {
   return user?.given_name ? `${user.given_name} ${user.family_name}` : user?.name;
 };
 
@@ -40,4 +44,4 @@ function getRespect(aiAge: number, userAge: number): RespectLevel {
   return rule ? rule.respect : "medium";
 }
 
-export { checkUserIsAdmin, getNameFromUser, toNumber, getRespect };
+export { checkUserIsAdmin, getNameFromUser, toNumber, getRespect, getNameAndFamilyFromUser };

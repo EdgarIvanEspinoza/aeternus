@@ -2,17 +2,16 @@ import React, { useEffect, useRef } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
 import { ChatMessage } from './ChatMessage/ChatMessage';
-// import { addToast } from '@heroui/react';
-// import pusherClient from '@lib/events/notifications';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { getNameAndFamilyFromUser, getNameFromUser } from '@utils/main.utils';
 
 export const Chat = ({
-  username,
   adminMode,
 }: {
-  username: string | null | undefined;
   adminMode: boolean;
 }): React.ReactElement => {
-  const { messages, input, handleInputChange, handleSubmit, loading, savingMessages } = ChatHook(username);
+  const { user } = useUser();
+  const { messages, input, handleInputChange, handleSubmit, loading, savingMessages } = ChatHook(getNameFromUser(user));
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,7 +32,7 @@ export const Chat = ({
           {messages
             .filter((msg) => (adminMode ? true : msg.role !== 'system'))
             .map((message) => (
-              <ChatMessage key={message.id} message={message} role={message.role} username={username} />
+              <ChatMessage key={message.id} message={message} role={message.role} username={getNameAndFamilyFromUser(user)} />
             ))}
           <div ref={messagesEndRef} />
         </div>
