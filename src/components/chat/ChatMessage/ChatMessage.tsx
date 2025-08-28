@@ -2,6 +2,8 @@
 
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { Avatar } from '@heroui/react';
 
 const baseMessageStyles = 'text-[1.25rem] leading-[1.5] font-bold normal-case';
 const gradientText = (gradient: string) => ({
@@ -21,15 +23,19 @@ export const ChatMessage = ({
   username: string | null | undefined;
 }) => {
   const [QuantumReady, setQuantumReady] = useState(false);
+  const { user } = useUser();
+
   const isAssistant = role === 'assistant';
   const isSystem = role === 'system';
+  const isUser = role === 'user';
+
   let roleLabel: string;
   switch (role) {
     case 'user':
-      roleLabel = username ? `${username} 🧑‍💻` : 'User';
+      roleLabel = username ? `${username}` : 'User';
       break;
     case 'assistant':
-      roleLabel = 'Aeternus 🐲';
+      roleLabel = 'Lazar Schwartzman';
       break;
     case 'system':
       roleLabel = 'System';
@@ -37,6 +43,7 @@ export const ChatMessage = ({
     default:
       roleLabel = 'Unknown Role';
   }
+
   let gradient = 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
   switch (role) {
     case 'assistant':
@@ -48,8 +55,6 @@ export const ChatMessage = ({
     case 'system':
       gradient = 'linear-gradient(45deg, #2563eb -20%, #ca8a04 50%)';
       break;
-    default:
-      gradient = 'linear-gradient(45deg, #ca8a04 -20%, #dc2626 50%)';
   }
 
   useEffect(() => {
@@ -60,17 +65,57 @@ export const ChatMessage = ({
   }, []);
 
   return (
-    <div className="m-2" key={message.id}>
-      <div className="flex flex-col">
-        <p className="text-xl font-bold">{`${roleLabel}:`}</p>
+    <div
+      className={`m-2 flex ${isUser ? 'justify-end' : 'justify-start'}`}
+      key={message.id}
+    >
+      <div
+        className={`flex flex-col max-w-[75%] ${
+          isUser ? 'items-end text-right' : 'items-start text-left'
+        }`}
+      >
+        <span className="flex items-center gap-4 mb-2">
+          {!isUser && (
+            <Avatar
+              isBordered
+              as="button"
+              color="success"
+              src={
+                isUser
+                  ? user?.picture || 'https://www.gravatar.com/avatar?d=mp'
+                  : 'https://www.gravatar.com/avatar?d=mp'
+              }
+              alt="user-avatar"
+              size="sm"
+            />
+          )}
+          <p className="text-xl font-bold">{`${roleLabel}`}</p>
+          {isUser && (
+            <Avatar
+              isBordered
+              as="button"
+              color="success"
+              src={user?.picture || 'https://www.gravatar.com/avatar?d=mp'}
+              alt="user-avatar"
+              size="sm"
+            />
+          )}
+        </span>
+
+        {/* Mensaje o Loader */}
         {message.content.length === 0 && QuantumReady && (
-          <div className="my-4 ml-5">
+          <div className="my-4">
             <l-quantum size="45" speed="1.75" color="#ec4899"></l-quantum>
           </div>
         )}
-      </div>
-      <div className={baseMessageStyles} style={gradientText(gradient)}>
-        {isAssistant || isSystem ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
+
+        <div className={baseMessageStyles} style={gradientText(gradient)}>
+          {isAssistant || isSystem ? (
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          ) : (
+            message.content
+          )}
+        </div>
       </div>
     </div>
   );

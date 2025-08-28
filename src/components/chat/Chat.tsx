@@ -16,39 +16,6 @@ export const Chat = ({
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //   if (adminMode) {
-  //     const channel = pusherClient.subscribe('aeternus');
-
-  //     channel.bind('cypher-tool-notification', (data: { reaction: string; purpose: string; cypher: string }) => {
-  //       const toasts = [
-  //         {
-  //           title: 'Cypher Builder Tool',
-  //           description: `Reaction: ${data.reaction}`,
-  //         },
-  //         {
-  //           title: 'Cypher Builder Tool',
-  //           description: `Purpose: ${data.purpose}`,
-  //         },
-  //         {
-  //           title: 'Cypher Builder Tool',
-  //           description: `Cypher: ${data.cypher}`,
-  //         },
-  //       ];
-
-  //       toasts.forEach((toast, index) => {
-  //         setTimeout(() => {
-  //           addToast(toast);
-  //         }, index * 100);
-  //       });
-  //     });
-
-  //     return () => {
-  //       pusherClient.unsubscribe('cypher-builder-tool');
-  //     };
-  //   }
-  // }, []);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);

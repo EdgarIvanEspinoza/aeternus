@@ -50,7 +50,7 @@ const MainComponent = (): ReactElement => {
         />
         <main className="flex-1 dark flex flex-col items-center bg-background">
           {!isLoading && user && (
-            <Chat username={jacquesMode ? 'Jacques' : getNameFromUser(user)} adminMode={adminMode} />
+            <Chat username={jacquesMode ? 'Jacques Schwartzman' : getNameFromUser(user)} adminMode={adminMode} />
           )}
         </main>
       </div>

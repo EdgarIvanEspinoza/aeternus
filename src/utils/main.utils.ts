@@ -1,5 +1,5 @@
 const getNameFromUser = (user: any): string => {
-  return user?.given_name ? user.given_name : user?.name;
+  return user?.given_name ? `${user.given_name} ${user.family_name}` : user?.name;
 };
 
 const checkUserIsAdmin = (email: string): boolean => {
