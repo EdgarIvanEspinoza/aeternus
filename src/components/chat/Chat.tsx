@@ -6,12 +6,14 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { getNameAndFamilyFromUser, getNameFromUser } from '@utils/main.utils';
 
 export const Chat = ({
+  jacquesMode,
   adminMode,
 }: {
+  jacquesMode: boolean;
   adminMode: boolean;
 }): React.ReactElement => {
   const { user } = useUser();
-  const { messages, input, handleInputChange, handleSubmit, loading, savingMessages } = ChatHook(getNameFromUser(user));
+  const { messages, input, handleInputChange, handleSubmit, loading, savingMessages } = ChatHook(jacquesMode ? 'Jacques' : getNameFromUser(user));
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,7 +34,7 @@ export const Chat = ({
           {messages
             .filter((msg) => (adminMode ? true : msg.role !== 'system'))
             .map((message) => (
-              <ChatMessage key={message.id} message={message} role={message.role} username={getNameAndFamilyFromUser(user)} />
+              <ChatMessage key={message.id} message={message} role={message.role} username={jacquesMode ? 'Jacques Schwartzman' : getNameAndFamilyFromUser(user)} />
             ))}
           <div ref={messagesEndRef} />
         </div>
