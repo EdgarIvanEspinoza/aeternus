@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import neo4j from 'neo4j-driver';
-import { convertAgeToString } from '@utils/jsonToSentence';
+import { convertAgeToString, getCurrentAge, getRespect } from '@utils/jsonToSentence';
 import { toNumber } from '@utils/main.utils';
 
 const driver = neo4j.driver(
@@ -33,6 +33,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
         OPTIONAL MATCH (p)-[:LOVES]->(c)
         WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
+        // Hacer modulo de traer relacion con name sentiment, por cada closeFriends, closeFamily y bestFriends
+        
+        // OPTIONAL MATCH (p)-[r:{name: "sentiment"}]->(d)
+        // WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(d.name) AS sentiments
 
         RETURN {
             abilities: p.abilities,
@@ -124,10 +128,42 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const sentimentalRelations = ['girlfriend', 'boyfriend', 'crush'];
         const parentalRelations = ['wife', 'husband', 'bride', 'groom', 'love'];
 
+        // 📖 Diccionario de relaciones parentales
+        const parentalMap: Record<string, string> = {
+          SON: 'Son',
+          DAUGHTER: 'Daughter',
+          FATHER: 'Father',
+          MOTHER: 'Mother',
+        };
+
+        // 🔎 Buscar relación parental
+        const parentalRel = node.relationships.find((rel: any) => rel.name === 'Parental');
+        const userParental = parentalRel ? parentalMap[parentalRel.type.toUpperCase()] || 'Parental' : null;
+
+        // 🔎 Buscar relación de Sentiment
+        const sentimentRel = node.relationships.find((rel: any) => rel.name === 'Sentiment');
+        const userSentiment = sentimentRel ? sentimentRel.type : null;
+
+        // Calcular el Respect
+        const respectToUser = getRespect(getCurrentAge(node.dateOfBirth), getCurrentAge(node.userDateOfBirth));
+
+        // 💬 Extraer el sentimiento de la IA hacia el usuario
+        const feelingsRelation = node.relationships.find(
+          (rel: any) => rel.name?.toUpperCase() === "FEELINGS_ABOUT"
+        );
+
+        const feelingsAboutUser = feelingsRelation
+          ? feelingsRelation.type.replace("_ABOUT", "").toLowerCase()
+          : null;
+
         const detectedRelation = node.relationships.find(
           (rel: any) =>
             sentimentalRelations.includes(rel.type.toLowerCase()) || parentalRelations.includes(rel.type.toLowerCase())
         );
+
+        // 🔹 Buscar el nickname
+        const nicknameRel = node.relationships.find((rel: any) => rel.type === 'NICKNAMES');
+        const userNickname = nicknameRel ? nicknameRel.name : null;
 
         let relationshipClassification = null;
         if (detectedRelation) {
@@ -147,6 +183,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           startingCredibility: parseFloat(startingCredibility.toFixed(2)),
           perceivedIntelligence,
           relationshipClassification,
+          userParental,
+          userSentiment,
+          respectToUser,
+          userNickname,
+          feelingsAboutUser
         };
 
         console.log('[AI / Traits] Fetched traits:', node);
