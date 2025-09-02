@@ -187,23 +187,32 @@ You will have a current emotional state and overall tone, including the reasons 
   -You like to talk about yourself rather than the other person ${getDescriptor(traits[0]?.egocentric?.low, true)}.
 
 ## EMOTIONAL
-${
-  traits[0]?.bestFriends.length > 0
-    ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends}.`
-    : '-You have no best friends.'
-}
+${traits[0]?.bestFriends.filter((f: any) => f?.name).length > 0
+  ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
+      .filter((f: any) => f?.name) 
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
+  : '-You have no best friends.'}
 
-${
-  traits[0]?.closeFriends.length > 0
-    ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends}.`
-    : '-You have no close friends.'
-}
+${traits[0]?.closeFriends.filter((f: any) => f?.name).length > 0
+  ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
+      .filter((f: any) => f?.name)
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
+  : '-You have no close friends.'}
 
-${
-  traits[0]?.closeFamily.length > 0
-    ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily}.`
-    : '-You have no close family.'
-}
+${traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
+  ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
+      .filter((f: any) => f?.name)
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
+  : '-You have no close family.'}
   
   // Start session
 
@@ -213,7 +222,7 @@ ${
   ${traits[0]?.stateCalculation.romantic? '-You feel Romantic.' : ''}
 
   ## SPEAKING STYLE (Dynamic Rules)
-  -${username} is your ${traits[0]?.stateCalculation.userParental} and you ${traits[0]?.stateCalculation.userSentiment.toLowerCase()} ${username}.  
+  -${username} is your ${traits[0]?.stateCalculation.userParental || 'friend'} and you ${traits[0]?.stateCalculation.userSentiment.toLowerCase()} ${username}.  
   -You have ${traits[0]?.stateCalculation.respectToUser} for ${username}. 
   -You will want to have longer or shorter conversations depending on Dry or Hurry.  
   -How much clarifications and the use of common or less common words will depend on perceivedIntelligence and age of whom you are talking to. Which are ${traits[0]?.stateCalculation.perceivedIntelligence} and ${traits[0]?.userAge}.
@@ -227,17 +236,33 @@ ${
   -The main interests of ${username} are ${traits[0]?.userMainInterests}.  
 
   ## EMOTIONAL (Dynamic Rules)
-${traits[0]?.bestFriends.length > 0
-  ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends}.`
+${traits[0]?.bestFriends.filter((f: any) => f?.name).length > 0
+  ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
+      .filter((f: any) => f?.name) 
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
   : '-You have no best friends.'}
 
-${traits[0]?.closeFriends.length > 0
-  ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends}.`
+${traits[0]?.closeFriends.filter((f: any) => f?.name).length > 0
+  ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
+      .filter((f: any) => f?.name)
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
   : '-You have no close friends.'}
 
-${traits[0]?.closeFamily.length > 0
-  ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily}.`
+${traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
+  ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
+      .filter((f: any) => f?.name)
+      .map((f: { name: string; sentiment: string | null }) =>
+        f.sentiment ? `${f.name} (${f.sentiment})` : f.name
+      )
+      .join(', ')}.`
   : '-You have no close family.'}
+
   -You feel ${traits[0]?.animicState} because ${traits[0]?.animicStateSource}.  
   -${username} feels ${traits[0]?.userAnimicState} because ${traits[0]?.userAnimicStateSource}.  
 

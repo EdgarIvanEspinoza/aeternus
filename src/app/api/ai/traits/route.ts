@@ -18,25 +18,32 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const result = await session.run(`/*cypher*/
         MATCH (p:Person {name: '${activeAIName}'})
         MATCH (n:Person {name: '${activeUserName}'})
-
         OPTIONAL MATCH (p)-[r]->(n)
         WITH p, n, collect(r) AS relationships
 
-        OPTIONAL MATCH (p)-[:BEST_FRIEND]->(a)
-        WITH p, n, relationships, collect(a.name) AS bestFriends
+    // Best friends + posible Sentiment rel (sentBF)
+      OPTIONAL MATCH (p)-[:BEST_FRIEND]->(bf)
+      OPTIONAL MATCH (p)-[sentBF]->(bf) WHERE sentBF.name = "Sentiment"
+      WITH p, n, relationships, collect(
+        { name: bf.name, sentiment: CASE WHEN sentBF IS NULL THEN null ELSE type(sentBF) END }
+      ) AS bestFriends
 
-        OPTIONAL MATCH (p)-[:CLOSE_FRIEND]->(b)
-        WITH p, n, relationships, bestFriends, collect(b.name) AS closeFriends
+      // Close friends + posible Sentiment rel (sentCF)
+      OPTIONAL MATCH (p)-[:CLOSE_FRIEND]->(cf)
+      OPTIONAL MATCH (p)-[sentCF]->(cf) WHERE sentCF.name = "Sentiment"
+      WITH p, n, relationships, bestFriends, collect(
+        { name: cf.name, sentiment: CASE WHEN sentCF IS NULL THEN null ELSE type(sentCF) END }
+      ) AS closeFriends
 
-        OPTIONAL MATCH (p)-[:CLOSE_FAMILY]->(c)
-        WITH p, n, relationships, bestFriends, closeFriends, collect(c.name) AS closeFamily
+      // Close family + posible Sentiment rel (sentFam)
+      OPTIONAL MATCH (p)-[:CLOSE_FAMILY]->(fam)
+      OPTIONAL MATCH (p)-[sentFam]->(fam) WHERE sentFam.name = "Sentiment"
+      WITH p, n, relationships, bestFriends, closeFriends, collect(
+        { name: fam.name, sentiment: CASE WHEN sentFam IS NULL THEN null ELSE type(sentFam) END }
+      ) AS closeFamily
 
         OPTIONAL MATCH (p)-[:LOVES]->(c)
         WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
-        // Hacer modulo de traer relacion con name sentiment, por cada closeFriends, closeFamily y bestFriends
-        
-        // OPTIONAL MATCH (p)-[r:{name: "sentiment"}]->(d)
-        // WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(d.name) AS sentiments
 
         RETURN {
             abilities: p.abilities,
@@ -148,13 +155,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const respectToUser = getRespect(getCurrentAge(node.dateOfBirth), getCurrentAge(node.userDateOfBirth));
 
         // 💬 Extraer el sentimiento de la IA hacia el usuario
-        const feelingsRelation = node.relationships.find(
-          (rel: any) => rel.name?.toUpperCase() === "FEELINGS_ABOUT"
-        );
+        const feelingsRelation = node.relationships.find((rel: any) => rel.name?.toUpperCase() === 'FEELINGS_ABOUT');
 
-        const feelingsAboutUser = feelingsRelation
-          ? feelingsRelation.type.replace("_ABOUT", "").toLowerCase()
-          : null;
+        const feelingsAboutUser = feelingsRelation ? feelingsRelation.type.replace('_ABOUT', '').toLowerCase() : null;
 
         const detectedRelation = node.relationships.find(
           (rel: any) =>
@@ -187,7 +190,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           userSentiment,
           respectToUser,
           userNickname,
-          feelingsAboutUser
+          feelingsAboutUser,
         };
 
         console.log('[AI / Traits] Fetched traits:', node);
