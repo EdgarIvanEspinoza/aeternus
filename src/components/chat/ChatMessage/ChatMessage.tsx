@@ -75,14 +75,14 @@ export const ChatMessage = ({
         }`}
       >
         <span className="flex items-center gap-4 mb-2">
-          {!isUser && (
+          {!isUser &&  !isSystem && (
             <Avatar
               isBordered
               as="button"
               color="success"
               src={
-                isUser
-                  ? user?.picture || 'https://www.gravatar.com/avatar?d=mp'
+                isAssistant
+                  ? 'assets/lequi_avatar.webp'
                   : 'https://www.gravatar.com/avatar?d=mp'
               }
               alt="user-avatar"
