@@ -26,8 +26,7 @@
       "@utils/*": ["utils/*"],
       "@hooks/*": ["hooks/*"]
     },
-    "types": ["node"],
-    "ignoreDeprecations": "6.0"
+    "types": ["node"]
   },
   "include": [
     "next-env.d.ts",
