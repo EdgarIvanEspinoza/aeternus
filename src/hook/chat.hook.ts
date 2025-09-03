@@ -84,6 +84,21 @@ const ChatHook = (
     }
   }
 
+  function getSentimentTowardSentence(sentiment: string) {
+    switch (sentiment) {
+      case 'LOVES':
+        return 'for which you feel love';
+      case 'HATES':
+        return 'for which you feel hate';
+      case 'LIKES':
+        return 'whom you like';
+      case 'DISLIKES':
+        return 'whom you dislike';
+      default:
+        return 'for which you feel indifferent';
+    }
+  }
+
   useEffect(() => {
     const initializeMessages = async () => {
       if (!user?.sub) return;
@@ -192,7 +207,7 @@ ${
     ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no best friends.'
@@ -203,7 +218,7 @@ ${
     ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no close friends.'
@@ -214,7 +229,7 @@ ${
     ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no close family.'
@@ -251,7 +266,7 @@ ${
     ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no best friends.'
@@ -262,7 +277,7 @@ ${
     ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no close friends.'
@@ -273,7 +288,7 @@ ${
     ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
         )
         .join(', ')}.`
     : '-You have no close family.'
