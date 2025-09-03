@@ -191,7 +191,9 @@ ${
   traits[0]?.bestFriends.filter((f: any) => f?.name).length > 0
     ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no best friends.'
 }
@@ -200,7 +202,9 @@ ${
   traits[0]?.closeFriends.filter((f: any) => f?.name).length > 0
     ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no close friends.'
 }
@@ -209,7 +213,9 @@ ${
   traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
     ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no close family.'
 }
@@ -244,7 +250,9 @@ ${
   traits[0]?.bestFriends.filter((f: any) => f?.name).length > 0
     ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no best friends.'
 }
@@ -253,7 +261,9 @@ ${
   traits[0]?.closeFriends.filter((f: any) => f?.name).length > 0
     ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no close friends.'
 }
@@ -262,7 +272,9 @@ ${
   traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
     ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) => (f.sentiment ? `${f.name} (${f.sentiment})` : f.name))
+        .map((f: { name: string; sentiment: string | null }) =>
+          f.sentiment ? `${f.name} for which you feel ${f.sentiment.toLowerCase()}` : f.name
+        )
         .join(', ')}.`
     : '-You have no close family.'
 }
