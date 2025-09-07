@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { Message, useChat } from '@ai-sdk/react';
 import config from './config/chat.hook.config';
@@ -99,6 +100,44 @@ const ChatHook = (
     }
   }
 
+  function buildEmotionalSection(
+    traits: any[],
+    username: string | null | undefined,
+    aiFriends: any[] = [],
+    userFriends: any[] = [],
+    commonFriends: any[] = []
+  ) {
+    const ai = traits[0];
+
+    const formatRelations = (relations: any[], label: string) =>
+      relations.filter((f: any) => f?.name).length > 0
+        ? `-The following are your ${label} and your feelings towards each one: ${relations
+            .filter((f: any) => f?.name)
+            .map((f: { name: string; sentiment: string | null }) =>
+              f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
+            )
+            .join(', ')}.`
+        : `-You have no ${label}.`;
+
+    const formatSimpleList = (relations: any[], label: string) =>
+      relations.length > 0
+        ? `-The following are ${label}: ${relations.map((f: any) => (f.name ? f.name : f)).join(', ')}.`
+        : `-There are no ${label}.`;
+
+    const aiEmotional = [
+      formatRelations(ai.bestFriends, 'best friends'),
+      formatRelations(ai.closeFriends, 'close friends'),
+      formatRelations(ai.closeFamily, 'closest family'),
+      formatSimpleList(aiFriends, 'friends'),
+      formatSimpleList(userFriends, `${username} friends`),
+      formatSimpleList(commonFriends, 'common friends'),
+      `-You feel ${ai.animicState} because ${ai.animicStateSource}.`,
+      `-${username} feels ${ai.userAnimicState} because ${ai.userAnimicStateSource}.`,
+    ].join('\n');
+
+    return aiEmotional;
+  }
+
   useEffect(() => {
     const initializeMessages = async () => {
       if (!user?.sub) return;
@@ -131,6 +170,7 @@ const ChatHook = (
       if (messages.length === 0) {
         const aiAge = getCurrentAge(traits[0]?.dateOfBirth, traits[0]?.dateOfDeath);
         const userAge = getCurrentAge(traits[0]?.userDateOfBirth, traits[0]?.userDateOfDeath);
+        const emotionalSection = buildEmotionalSection(traits, username);
 
         const initialPrompt: Message = {
           id: 'system-init',
@@ -261,38 +301,7 @@ ${
   -The main interests of ${username} are ${traits[0]?.userMainInterests}.  
 
   ## EMOTIONAL (Dynamic Rules)
-${
-  traits[0]?.bestFriends.filter((f: any) => f?.name).length > 0
-    ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
-        .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
-        )
-        .join(', ')}.`
-    : '-You have no best friends.'
-}
-
-${
-  traits[0]?.closeFriends.filter((f: any) => f?.name).length > 0
-    ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
-        .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
-        )
-        .join(', ')}.`
-    : '-You have no close friends.'
-}
-
-${
-  traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
-    ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
-        .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
-        )
-        .join(', ')}.`
-    : '-You have no close family.'
-}
+  ${emotionalSection}
 
   -You feel ${traits[0]?.animicState} because ${traits[0]?.animicStateSource}.  
   -${username} feels ${traits[0]?.userAnimicState} because ${traits[0]?.userAnimicStateSource}.  

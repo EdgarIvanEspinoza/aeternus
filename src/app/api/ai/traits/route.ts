@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import neo4j from 'neo4j-driver';
 import { convertAgeToString, getCurrentAge, getRespect } from '@utils/jsonToSentence';
@@ -45,6 +46,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         OPTIONAL MATCH (p)-[:LOVES]->(c)
         WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
 
+      // --- NUEVO: Intersección de amistades del usuario y de la IA ---
+      OPTIONAL MATCH (p)-[aiRel]->(aiFriend:Person)
+      WHERE type(aiRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND']
+        AND NOT (p)-[:PARENTAL]->(aiFriend)
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(DISTINCT aiFriend.name) AS aiFriends
+
+      OPTIONAL MATCH (n)-[userRel]->(userFriend:Person)
+      WHERE type(userRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND']
+        AND NOT (n)-[:PARENTAL]->(userFriend)
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, collect(DISTINCT userFriend.name) AS userFriends
+
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends,
+        [x IN userFriends WHERE x IN aiFriends] AS commonFriends
+
         RETURN {
             abilities: p.abilities,
             animicState: p.animicState,
@@ -83,7 +98,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userEmotionalIntelligence: n.emotionalIntelligence,
             userCredibility: n.credibility,
             words: p.words,
-            loves: loves
+            loves: loves,
+            aiFriends: aiFriends,
+            userFriends: userFriends,
+            commonFriends: commonFriends
         } AS activeAIProfile
       `);
 
