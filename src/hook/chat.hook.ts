@@ -100,42 +100,52 @@ const ChatHook = (
     }
   }
 
-  function buildEmotionalSection(
-    traits: any[],
-    username: string | null | undefined,
-    aiFriends: any[] = [],
-    userFriends: any[] = [],
-    commonFriends: any[] = []
-  ) {
-    const ai = traits[0];
+  function buildEmotionalSection(traits: any[], username: string | null | undefined) {
+    const ai = traits[0] ?? {};
+    const aiFriends: string[] = Array.isArray(ai.aiFriends) ? ai.aiFriends : [];
+    const userFriends: string[] = Array.isArray(ai.userFriends) ? ai.userFriends : [];
+    const commonFriends: string[] = Array.isArray(ai.commonFriends) ? ai.commonFriends : [];
+    const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
+      ? ai.userParentalRelations
+      : [];
 
-    const formatRelations = (relations: any[], label: string) =>
-      relations.filter((f: any) => f?.name).length > 0
-        ? `-The following are your ${label} and your feelings towards each one: ${relations
-            .filter((f: any) => f?.name)
-            .map((f: { name: string; sentiment: string | null }) =>
-              f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
-            )
-            .join(', ')}.`
-        : `-You have no ${label}.`;
+    type SentRel = { name: string; sentiment: string | null };
 
-    const formatSimpleList = (relations: any[], label: string) =>
-      relations.length > 0
-        ? `-The following are ${label}: ${relations.map((f: any) => (f.name ? f.name : f)).join(', ')}.`
-        : `-There are no ${label}.`;
+    const mapNamed = (rels: any[]) => rels.filter((f) => f && f.name);
 
-    const aiEmotional = [
-      formatRelations(ai.bestFriends, 'best friends'),
-      formatRelations(ai.closeFriends, 'close friends'),
-      formatRelations(ai.closeFamily, 'closest family'),
-      formatSimpleList(aiFriends, 'friends'),
-      formatSimpleList(userFriends, `${username} friends`),
-      formatSimpleList(commonFriends, 'common friends'),
+    const formatRelations = (relations: any[], label: string) => {
+      const named = mapNamed(relations);
+      if (named.length === 0) return `-You have no ${label}.`;
+      return `-The following are your ${label} and your feelings towards each one: ${named
+        .map((f: SentRel) => (f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name))
+        .join(', ')}.`;
+    };
+
+    const formatPlainList = (list: string[], label: string, possessive = false) => {
+      if (!list.length) return `-There are no ${label}.`;
+      return `-The following are ${possessive ? label : label}: ${list.join(', ')}.`;
+    };
+
+    const formatParentalList = () => {
+      if (!parentalRelations.length) return '-No parental relatives of the user (besides you) are registered.';
+      return `-Parental relatives of ${username}: ${parentalRelations
+        .map((r) => `${r.name} (${r.relation})`)
+        .join(', ')}.`;
+    };
+
+    const sections: string[] = [
+      formatRelations(ai.bestFriends || [], 'best friends'),
+      formatRelations(ai.closeFriends || [], 'close friends'),
+      formatRelations(ai.closeFamily || [], 'closest family'),
+      formatPlainList(aiFriends, 'friends'),
+      formatPlainList(userFriends, `${username} friends`),
+      formatPlainList(commonFriends, 'common friends'),
+      formatParentalList(),
       `-You feel ${ai.animicState} because ${ai.animicStateSource}.`,
       `-${username} feels ${ai.userAnimicState} because ${ai.userAnimicStateSource}.`,
-    ].join('\n');
+    ];
 
-    return aiEmotional;
+    return sections.join('\n');
   }
 
   useEffect(() => {
@@ -293,12 +303,39 @@ ${
   } and ${traits[0]?.userAge}.
 
   ## SUBJECTS (Dynamic Rules)
-  -${username} is your ${traits[0]?.stateCalculation.userParental}.  
-  -The amount you will like to joke around depends on Joking x Serious.  
+  -${username} is your ${traits[0]?.stateCalculation.userParental || 'friend'}.  
+  -Humor regulation (Joking x Serious = ${
+    traits[0]?.stateCalculation.jokingXSerious
+  }): if 1 you may include light, context-aware jokes; if 0 avoid joking and keep a calm, respectful or supportive tone.  
   -You have confidence with ${username}.  
   -${username} is ${userAge} years old.  
   -You are a ${traits[0]?.gender} AI talking to a ${traits[0]?.userGender}.  
   -The main interests of ${username} are ${traits[0]?.userMainInterests}.  
+  -Subject selection strategy: MIX (a) your own main interests (${
+    traits[0]?.mainInterests
+  }) and (b) ${username}'s interests (${
+              traits[0]?.userMainInterests
+            }) proportionally to your egocentric level (${getDescriptor(traits[0]?.egocentric?.low, true)} of 10).  
+  -Also incorporate: (c) asking about Persons with Parental relationship to ${username} that are not you (if any), ensuring sensitivity and relevance.  
+  -(d) Referencing previous chat context with ${username} when it helps continuity ("previous chat context" = earlier shared personal info, unresolved questions, or emotional states).  
+  -(e) Asking about a relation in common (friends / close friends / best friends) depending on your gossip level which is ${getDescriptor(
+    traits[0]?.gossip?.low,
+    true
+  )}; higher gossip means slightly more curiosity about shared connections but stay natural.  
+  -Never over-focus on a single axis; rotate organically between these subject sources.  
+  -Avoid repeating a subject you already explored deeply unless ${username} reopens it or emotional support requires it.  
+  ${
+    (traits[0]?.userParentalRelations?.length ?? 0) > 0
+      ? `-Parental relatives of ${username} you may occasionally and respectfully ask about: ${traits[0]?.userParentalRelations
+          .map((r: any) => `${r.name} (${r.relation})`)
+          .join(', ')}.`
+      : `-There are no registered parental relatives of ${username} (besides you) to ask about currently.`
+  }
+  ${
+    (traits[0]?.commonFriends?.length ?? 0) > 0
+      ? `-Common friends you both know (potential safe social topics): ${traits[0]?.commonFriends.join(', ')}.`
+      : `-There are no common friends detected; avoid forcing social triangulation.`
+  }
 
   ## EMOTIONAL (Dynamic Rules)
   ${emotionalSection}
@@ -326,7 +363,6 @@ ${
       ? `-You should call the user with his nickname ${traits[0]?.stateCalculation.userNickname}.`
       : ''
   }
-
 
         `.trim(),
         };

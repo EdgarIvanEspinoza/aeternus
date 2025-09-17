@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
@@ -13,15 +14,20 @@ const gradientText = (gradient: string) => ({
   color: '#fff',
 });
 
+interface ChatMessageProps {
+  message: {
+    id: string | number;
+    content: string;
+  };
+  role: 'data' | 'user' | 'assistant' | 'system';
+  username: string | null | undefined;
+}
+
 export const ChatMessage = ({
   message,
   role,
   username,
-}: {
-  message: any;
-  role: 'data' | 'user' | 'assistant' | 'system';
-  username: string | null | undefined;
-}) => {
+}: ChatMessageProps) => {
   const [QuantumReady, setQuantumReady] = useState(false);
   const { user } = useUser();
 
