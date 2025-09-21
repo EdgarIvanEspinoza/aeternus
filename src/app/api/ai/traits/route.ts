@@ -103,6 +103,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userIntelligence: n.intelligence,
             userEmotionalIntelligence: n.emotionalIntelligence,
             userCredibility: n.credibility,
+            userGender: n.gender,
             words: p.words,
             loves: loves,
             aiFriends: aiFriends,
@@ -155,7 +156,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
         // 🧠 perceivedIntelligence
         const perceivedIntelligence = parseFloat(
-          (toNumber(node.intelligence ?? 0) - toNumber(node.user_intelligence ?? 0)).toFixed(2)
+          (toNumber(node.intelligence ?? 0) - toNumber(node.userIntelligence ?? 0)).toFixed(2)
         );
         // 📅 Formatear fechas
         node.dateOfBirth = convertAgeToString(node.dateOfBirth);
