@@ -24,6 +24,12 @@
 body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
+  background-color: #000; /* Ensure fallback solid black */
+  background-image: radial-gradient(circle at 20% 20%, rgba(167,139,250,0.08), transparent 60%),
+    radial-gradient(circle at 80% 40%, rgba(232,121,249,0.06), transparent 65%);
+  background-attachment: fixed;
+  background-size: cover; /* Avoid tiling */
+  color: #fff;
 }
 
 html {
