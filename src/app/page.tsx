@@ -4,7 +4,6 @@ import { ReactElement, useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Chat } from '@components/chat/Chat';
 import NavBar from '@components/navbar/NavBar';
-import { getNameAndFamilyFromUser } from '@utils/main.utils';
 import { useDisclosure } from '@heroui/react';
 import { LoginModal } from '@components/modal/LoginModal';
 
