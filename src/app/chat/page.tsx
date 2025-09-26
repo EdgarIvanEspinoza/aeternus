@@ -31,7 +31,9 @@ const ChatPage = (): ReactElement => {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col">
+      <div className="relative min-h-screen flex flex-col bg-black text-white overflow-hidden">
+        {/* Persistent black background layer */}
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-black" />
         <NavBar
           adminMode={adminMode}
           jacquesMode={jacquesMode}
@@ -44,7 +46,7 @@ const ChatPage = (): ReactElement => {
             localStorage.setItem('jacquesMode', JSON.stringify(mode));
           }}
         />
-        <main className="flex-1 dark flex flex-col items-center bg-background">
+        <main className="flex-1 flex flex-col items-center w-full">
           {!isLoading && user && <Chat jacquesMode={jacquesMode} adminMode={adminMode} />}
         </main>
       </div>
