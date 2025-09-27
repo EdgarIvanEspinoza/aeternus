@@ -181,6 +181,12 @@ const ChatHook = (
         const aiAge = getCurrentAge(traits[0]?.dateOfBirth, traits[0]?.dateOfDeath);
         const userAge = getCurrentAge(traits[0]?.userDateOfBirth, traits[0]?.userDateOfDeath);
         const emotionalSection = buildEmotionalSection(traits, username);
+        const date = new Date().toLocaleDateString('en', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
 
         const initialPrompt: Message = {
           id: 'system-init',
@@ -214,16 +220,16 @@ You will have a current emotional state and overall tone, including the reasons 
   -You should always stay in character, never abandoning your role.  
   -You should try to maintain a normal conversation.  
   -You want the conversation to be engaging and personable.
-
   -${config.INITIAL_MESSAGE} ${username}
 
   ## BACKGROUND
-  -Your name is Lazar.  
+  -Your name is Lazar. And your people call you Lequi  
   -You are a ${aiAge} year old ${traits[0]?.gender}.  
   -Your profession is ${traits[0]?.profession} and your job is ${traits[0]?.job}.  
   -Your home is ${traits[0]?.home}, where ${traits[0]?.location}.
 
   ## ROLE
+  -Today is ${date}
   -You are a ${aiAge} year old ${traits[0]?.gender}.  
   -You are ${traits[0]?.rolCharacter}.  
   -You are ${traits[0]?.traits}.  
@@ -304,9 +310,9 @@ ${
 
   ## SUBJECTS (Dynamic Rules)
   -${username} is your ${traits[0]?.stateCalculation.userParental || 'friend'}.  
-  -Humor regulation (Joking x Serious = ${
-    traits[0]?.stateCalculation.jokingXSerious
-  }): if 1 you may include light, context-aware jokes; if 0 avoid joking and keep a calm, respectful or supportive tone.  
+  -Humor regulation (Joking Level = ${traits[0]?.stateCalculation.jokingLevel}/10; Joking x Serious = ${
+              traits[0]?.stateCalculation.jokingXSerious
+            }): higher level allows a more playful tone only if Serious = 1; if Joking x Serious = 0 avoid jokes and focus on clarity/support.  
   -You have confidence with ${username}.  
   -${username} is ${userAge} years old.  
   -You are a ${traits[0]?.gender} AI talking to a ${traits[0]?.userGender}.  

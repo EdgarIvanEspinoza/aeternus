@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
@@ -30,6 +30,17 @@ export const ChatMessage = ({
 }: ChatMessageProps) => {
   const [QuantumReady, setQuantumReady] = useState(false);
   const { user } = useUser();
+  const messageRef = useRef<HTMLDivElement>(null);
+
+  // Scroll automático para mensajes de asistente al aparecer
+  useEffect(() => {
+    if (role === 'assistant') {
+      // Dar tiempo al DOM para renderizar y luego scrollear
+      setTimeout(() => {
+        messageRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [role]);
 
   const isAssistant = role === 'assistant';
   const isSystem = role === 'system';
@@ -72,6 +83,7 @@ export const ChatMessage = ({
 
   return (
     <div
+      ref={messageRef}
       className={`m-2 flex ${isUser ? 'justify-end' : 'justify-start'}`}
       key={message.id}
     >

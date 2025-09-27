@@ -1,10 +1,10 @@
+import React from 'react';
 import {
   Navbar,
   NavbarBrand,
   NavbarContent,
   Avatar,
   Link,
-  NavbarItem,
   Switch,
   Dropdown,
   DropdownItem,
@@ -14,7 +14,7 @@ import {
 } from '@heroui/react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { AeternusTitle } from './Title';
-import { useState } from 'react';
+import NextLink from 'next/link';
 import { checkUserIsAdmin } from '@utils/main.utils';
 import { ResetConversationButton } from './DeleteConversationButton';
 import { CloseSessionButton } from './CloseSessionButton';
@@ -27,7 +27,6 @@ type Props = {
 };
 
 const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode }: Props) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useUser();
 
   const handleJacquesMode = () => {
@@ -41,9 +40,11 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
   };
 
   return (
-    <Navbar isBordered className="px-6 py-3 shadow-md backdrop-blur-sm bg-opacity-90" onMenuOpenChange={setIsMenuOpen}>
+  <Navbar isBordered className="px-6 py-3 shadow-md backdrop-blur-sm bg-black/80 border-b border-zinc-800/60 fixed top-0 left-0 right-0 z-30">
       <NavbarBrand>
-        <AeternusTitle>Aeternus</AeternusTitle>
+        <NextLink href="/" className="focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 rounded-sm">
+          <AeternusTitle>Aeternus</AeternusTitle>
+        </NextLink>
       </NavbarBrand>
       <NavbarContent justify="end">
         <Dropdown
@@ -103,6 +104,9 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 <Link href="/api/auth/logout" color="danger">
                   Log Out
                 </Link>
+              </DropdownItem>
+              <DropdownItem key="back_home">
+                <Link href="/" color='danger'>Exit</Link>
               </DropdownItem>
             </DropdownSection>
           </DropdownMenu>

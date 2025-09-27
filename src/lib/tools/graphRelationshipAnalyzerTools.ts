@@ -13,7 +13,7 @@ export const graphRelationshipAnalyzerTool: Tool = {
   async execute({ person_a, person_b }) {
     let session;
     console.log(`[TOOL / Graph Analyzer] => Analyzing ${person_a} and ${person_b}`);
-
+    // TODO: Decirle que cuando busque de el mismo se busque como Lequi
     try {
       // Paso 1: Pide a GPT un Cypher
       const cypherPrompt = `
@@ -94,6 +94,7 @@ export const graphRelationshipAnalyzerTool: Tool = {
       console.log('[TOOL / Graph Analyzer] => Cypher result:', records);
 
       // Paso 3: Pide a GPT que analice el resultado
+      // TODO: Rehace el prompt para quitar el Assistant y hacerlo mas natural
       const analysisPrompt = `
         You are an assistant analyzing the relationship between "${person_a}" and "${person_b}".
         The following is the result of a Cypher query from a Neo4j database:

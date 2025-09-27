@@ -95,6 +95,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             rutine: p.rutine,
             specialCondition: p.specialCondition,
             traits: p.traits,
+            joking: p.joking,
             userDateOfBirth: n.dateOfBirth,
             userDateOfDeath: n.dateOfDeath,
             userAnimicState: n.animicState,
@@ -131,8 +132,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           node.relationships.some((rel: any) => types.includes(rel.type.toLowerCase()));
 
         const romantic = hasRelationship(romanticTypes);
-        // 🃏 Joking = 1 si la relación entre Usuario e IA es cercana (BEST_FRIEND, CLOSE_FRIEND, CLOSE_FAMILY)
-        const joking = hasRelationship(jokingTypes);
+        // 🃏 Joking: valor base (0-10) tomado del nodo p.joking. Si NO hay relación cercana (closeFamily/closeFriends/bestFriends) se resta 3.
+        const baseJokingRaw = toNumber(node.joking) ?? 0;
+        const baseJoking = isNaN(baseJokingRaw) ? 0 : baseJokingRaw; // seguridad
+        const hasCloseRelation = hasRelationship(jokingTypes);
+        let jokingLevel = hasCloseRelation ? baseJoking : baseJoking - 3;
+        if (jokingLevel < 0) jokingLevel = 0;
+        if (jokingLevel > 10) jokingLevel = 10;
+        // Boolean legacy (mantener compatibilidad si alguna parte del front aún lo usa)
+        const joking = jokingLevel > 0;
 
         // 😐 Serious (según glosario): debe anular el factor si alguno está "bad" (mal humor).
         // Interpretación: Serious = 1 cuando ninguno está en mal estado; 0 si IA o Usuario están en "bad".
@@ -140,8 +148,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const userBad = (node.userAnimicState || '').toLowerCase() === 'bad';
         const serious = !(aiBad || userBad);
 
-        // 🧮 Joking x Serious (numérico 0 ó 1)
-        const jokingXSerious = (joking ? 1 : 0) * (serious ? 1 : 0);
+        // 🧮 Joking x Serious (numérico 0 ó 1) usando el nivel (si nivel > 0 y serious=1)
+        const jokingXSerious = (jokingLevel > 0 ? 1 : 0) * (serious ? 1 : 0);
 
         // 😤 Calcular dry
         const dry = node.relationships.some((rel: any) => rel.type === 'ANGRY_ABOUT') || node.rutine === 'hurry';
@@ -216,7 +224,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         // ✅ Agregar resultados
         node.stateCalculation = {
           romantic,
-          joking,
+          joking, // boolean
+          jokingLevel, // 0-10 ajustado
           serious,
           jokingXSerious,
           dry,
