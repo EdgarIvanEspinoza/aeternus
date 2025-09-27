@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Button, Modal, ModalContent, ModalHeader, ModalFooter } from '@heroui/react';
 
-//TODO: ReDo this page to use the new modal component from heroui/react
 export default function Policies() {
   return (
     <Modal
