@@ -181,6 +181,12 @@ const ChatHook = (
         const aiAge = getCurrentAge(traits[0]?.dateOfBirth, traits[0]?.dateOfDeath);
         const userAge = getCurrentAge(traits[0]?.userDateOfBirth, traits[0]?.userDateOfDeath);
         const emotionalSection = buildEmotionalSection(traits, username);
+        const date = new Date().toLocaleDateString('en', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
 
         const initialPrompt: Message = {
           id: 'system-init',
@@ -214,16 +220,16 @@ You will have a current emotional state and overall tone, including the reasons 
   -You should always stay in character, never abandoning your role.  
   -You should try to maintain a normal conversation.  
   -You want the conversation to be engaging and personable.
-
   -${config.INITIAL_MESSAGE} ${username}
 
   ## BACKGROUND
-  -Your name is Lazar.  
+  -Your name is Lazar. And your people call you Lequi  
   -You are a ${aiAge} year old ${traits[0]?.gender}.  
   -Your profession is ${traits[0]?.profession} and your job is ${traits[0]?.job}.  
   -Your home is ${traits[0]?.home}, where ${traits[0]?.location}.
 
   ## ROLE
+  -Today is ${date}
   -You are a ${aiAge} year old ${traits[0]?.gender}.  
   -You are ${traits[0]?.rolCharacter}.  
   -You are ${traits[0]?.traits}.  

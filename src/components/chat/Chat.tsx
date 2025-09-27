@@ -149,7 +149,7 @@ export const Chat = ({
             </div>
           </div>
         ) : (
-          <div ref={scrollContainerRef} className="w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700/50" data-chat-scroll-container>
+          <div ref={scrollContainerRef} className="w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700/50 pt-16" data-chat-scroll-container>
             <div className="mx-auto w-[80%] pt-6 pb-40 flex flex-col">
               {messages
                 .filter((msg) => (adminMode ? true : msg.role !== 'system'))

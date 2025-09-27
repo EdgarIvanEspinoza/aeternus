@@ -40,7 +40,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
   };
 
   return (
-  <Navbar isBordered className="px-6 py-3 shadow-md backdrop-blur-sm bg-opacity-90">
+  <Navbar isBordered className="px-6 py-3 shadow-md backdrop-blur-sm bg-black/80 border-b border-zinc-800/60 fixed top-0 left-0 right-0 z-30">
       <NavbarBrand>
         <NextLink href="/" className="focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 rounded-sm">
           <AeternusTitle>Aeternus</AeternusTitle>

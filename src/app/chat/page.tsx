@@ -46,7 +46,7 @@ const ChatPage = (): ReactElement => {
             localStorage.setItem('jacquesMode', JSON.stringify(mode));
           }}
         />
-        <main className="flex-1 flex flex-col items-center w-full">
+        <main className="flex-1 flex flex-col items-center w-full pt-14">
           {!isLoading && user && <Chat jacquesMode={jacquesMode} adminMode={adminMode} />}
         </main>
       </div>
