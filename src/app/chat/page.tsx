@@ -69,12 +69,12 @@ const ChatPage = (): ReactElement => {
                   Your email is not currently on our alpha test access list. If you believe this is an error or 
                   would like to request access, please contact the administrator.
                 </p>
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-4">
                   <a 
-                    href="/"
+                    href="/api/auth/logout?returnTo=/"
                     className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
                   >
-                    Return Home
+                    Logout & Return Home
                   </a>
                 </div>
               </div>

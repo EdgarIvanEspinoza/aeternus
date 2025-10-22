@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
 import { ChatMessage } from './ChatMessage/ChatMessage';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { getNameAndFamilyFromUser, getNameFromUser } from '@utils/main.utils';
+import { AlphaInfoModal } from '@components/modal/AlphaInfoModal';
 
 export const Chat = ({
   jacquesMode,
@@ -14,10 +15,23 @@ export const Chat = ({
 }): React.ReactElement => {
   const { user } = useUser();
   const { messages, input, handleInputChange, handleSubmit, loading } = ChatHook(jacquesMode ? 'Jacques' : getNameFromUser(user));
+  const [showAlphaModal, setShowAlphaModal] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const autoScrollRef = useRef(true); // whether we should keep following bottom
+
+  // Mostrar modal de información de Alpha al inicio - ahora se muestra siempre
+  useEffect(() => {
+    // Mostrar el modal siempre que se cargue el componente
+    setShowAlphaModal(true);
+  }, []);
+
+  // Función para cerrar modal - ya no guarda estado en localStorage
+  const handleAlphaModalClose = (open: boolean) => {
+    setShowAlphaModal(open);
+    // Ya no guardamos en localStorage para que se muestre cada vez
+  };
 
   // Exponer la función para uso directo desde componentes hijos como ChatInput
   const scrollToBottom = useCallback((smooth: boolean = false) => {
@@ -168,6 +182,9 @@ export const Chat = ({
           </div>
         </div>
       </div>
+      
+      {/* Modal informativo para usuarios de Alpha */}
+      <AlphaInfoModal isOpen={showAlphaModal} onOpenChange={handleAlphaModalClose} />
     </>
   );
 };
