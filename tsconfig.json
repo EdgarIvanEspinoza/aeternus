@@ -50,6 +50,11 @@
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off"
   },
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off"
+  },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
