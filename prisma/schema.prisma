@@ -33,3 +33,31 @@ model ChatMessage {
   createdAt      DateTime @default(now())
   conversationId String
 }
+
+model Feedback {
+  id         String   @id @default(cuid())
+  type       String   
+  content    String
+  userId     String
+  userEmail  String
+  createdAt  DateTime @default(now())
+  status     String   @default("pending") // pending, reviewed, resolved
+  adminNotes String?
+}
+
+model Invitation {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  status     String   @default("pending") // pending, sent, accepted
+  createdAt  DateTime @default(now())
+  lastSentAt DateTime?
+}
+
+model ChatSession {
+  userId         String
+  conversationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@id([userId, conversationId])
+}

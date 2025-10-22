@@ -1,34 +1,104 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Aeternus AI
 
-## Getting Started
+Aeternus es una plataforma de chat con IA diseñada para proporcionar conversaciones naturales y significativas, ofreciendo una experiencia única y personalizada.
 
-First, run the development server:
+## Características principales
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+- **Sistema de Onboarding Progresivo**: Guía a los usuarios paso a paso a través de las funcionalidades clave.
+- **Sistema de Feedback para usuarios Alpha**: Permite a los usuarios compartir opiniones y reportar problemas.
+- **Sistema de Manejo de Invitaciones**: Control completo para gestionar invitaciones a usuarios alpha.
+- **Optimización de Chat**: Caché local para mejorar rendimiento y recuperación de conversaciones.
+- **Panel de Administración**: Control de usuarios y conversaciones para administradores.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tecnologías utilizadas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js 14 con App Router
+- Auth0 para autenticación
+- Prisma ORM con PostgreSQL
+- HeroUI para componentes de interfaz
+- Neo4j para grafos de relaciones
+- OpenAI API para la funcionalidad de chat
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Comenzando
 
-## Learn More
+### Prerrequisitos
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js 18.x o superior
+- PostgreSQL
+- Neo4j (opcional para funcionalidades avanzadas)
+- Cuenta de Auth0
+- Clave API de OpenAI
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Instalación
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. Clona el repositorio:
 
-## Deploy on Vercel
+   ```bash
+   git clone https://github.com/tuusuario/aeternus.git
+   cd aeternus
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Instala las dependencias:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   ```bash
+   npm install
+   ```
+
+3. Configura las variables de entorno copiando el archivo `.env.example` a `.env.local` y completa las variables requeridas:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Ejecuta las migraciones de la base de datos:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Inicia el servidor de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+
+## Estructura del proyecto
+
+- `/src/app`: Rutas y páginas de la aplicación
+- `/src/components`: Componentes reutilizables
+- `/src/hooks`: Hooks personalizados
+- `/src/lib`: Utilidades y configuraciones
+- `/src/utils`: Funciones auxiliares
+- `/prisma`: Esquema de base de datos y migraciones
+
+## Características para usuarios Alpha
+
+- Onboarding guiado paso a paso
+- Sistema de feedback integrado
+- Experiencia de chat optimizada
+- Interfaz intuitiva y accesible
+
+## Panel de administración
+
+El panel de administración permite:
+
+- Ver todas las conversaciones almacenadas
+- Gestionar invitaciones para usuarios alpha
+- Monitorear feedback de usuarios
+- Configurar aspectos del sistema
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
+
+1. Fork el repositorio
+2. Crea una rama para tu funcionalidad (`git checkout -b feature/amazing-feature`)
+3. Haz commit de tus cambios (`git commit -m 'Add some amazing feature'`)
+4. Push a la rama (`git push origin feature/amazing-feature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto está licenciado bajo términos privados. Todos los derechos reservados.

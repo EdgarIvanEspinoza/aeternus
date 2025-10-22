@@ -5,6 +5,8 @@ import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { UserDataSync } from '../components/auth/UserDataSync';
+import ProgressiveOnboarding from '../components/onboarding/ProgressiveOnboarding';
+import FeedbackWidget from '../components/feedback/FeedbackWidget';
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -17,6 +19,8 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
       <UserProvider>
         <div className="relative min-h-screen">
           <UserDataSync />
+          <ProgressiveOnboarding />
+          <FeedbackWidget />
           <ToastProvider
             placement="top-center"
             toastProps={{

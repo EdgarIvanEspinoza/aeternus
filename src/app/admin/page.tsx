@@ -110,17 +110,29 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <div className="flex gap-4">
             <Link 
+              href="/admin/feedbacks" 
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+            >
+              Ver Feedbacks
+            </Link>
+            <Link 
+              href="/admin/invitations" 
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+            >
+              Gestionar Invitaciones
+            </Link>
+            <Link 
+              href="/admin/smtp-config" 
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+            >
+              Config. SMTP
+            </Link>
+            <Link 
               href="/chat" 
               className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
             >
-              Go to Chat
+              Ir al Chat
             </Link>
-            <a 
-              href="/api/auth/logout?returnTo=/"
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
-            >
-              Logout
-            </a>
           </div>
         </div>
         

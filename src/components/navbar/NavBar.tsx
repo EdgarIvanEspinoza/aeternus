@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
+  Button,
 } from '@heroui/react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { AeternusTitle } from './Title';
@@ -18,6 +19,7 @@ import NextLink from 'next/link';
 import { checkUserIsAdmin } from '@utils/main.utils';
 import { ResetConversationButton } from './DeleteConversationButton';
 import { CloseSessionButton } from './CloseSessionButton';
+import { MenuIcon, MessageSquarePlus, MessageCircle, LayoutDashboard } from 'lucide-react';
 
 type Props = {
   adminMode: boolean;
@@ -28,6 +30,11 @@ type Props = {
 
 const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode }: Props) => {
   const { user } = useUser();
+  const [isChat, setIsChat] = React.useState(false);
+  
+  React.useEffect(() => {
+    setIsChat(window.location.pathname.startsWith('/chat'));
+  }, []);
 
   const handleJacquesMode = () => {
     localStorage.setItem('jacquesMode', JSON.stringify(!jacquesMode));
@@ -47,6 +54,49 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
         </NextLink>
       </NavbarBrand>
       <NavbarContent justify="end">
+        {/* Botones de navegación contextual */}
+        {!isChat && (
+          <Button
+            color="secondary"
+            variant="flat"
+            aria-label="Ir al chat"
+            className="mr-2"
+            as={NextLink}
+            href="/chat"
+            startContent={<MessageCircle size={18} />}
+          >
+            <span className="hidden sm:inline">Ir al Chat</span>
+            <span className="sm:hidden">Chat</span>
+          </Button>
+        )}
+        
+        {isChat && checkUserIsAdmin(user?.email || '') && (
+          <Button
+            color="secondary"
+            variant="flat"
+            aria-label="Admin Dashboard"
+            className="mr-2"
+            as={NextLink}
+            href="/admin"
+            startContent={<LayoutDashboard size={18} />}
+          >
+            <span className="hidden sm:inline">Dashboard</span>
+            <span className="sm:hidden">Admin</span>
+          </Button>
+        )}
+        
+        {/* Botón de Feedback */}
+        <Button
+          isIconOnly
+          color="primary"
+          variant="flat"
+          aria-label="Enviar feedback"
+          className="mr-2"
+          onPress={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))}
+        >
+          <MessageSquarePlus size={20} />
+        </Button>
+        
         <Dropdown
           showArrow
           classNames={{
@@ -56,14 +106,21 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           radius="sm"
           closeOnSelect={false}>
           <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              color="success"
-              src={user?.picture || 'https://www.gravatar.com/avatar?d=mp'}
-              alt="user-avatar"
-              size="sm"
-            />
+            <Button
+              variant="flat"
+              className="flex items-center gap-2 min-w-0 px-3"
+              startContent={<MenuIcon size={20} />}
+            >
+              <Avatar
+                isBordered
+                color="success"
+                src={user?.picture || 'https://www.gravatar.com/avatar?d=mp'}
+                alt="user-avatar"
+                size="sm"
+                className="ml-2"
+              />
+              <span className="hidden sm:inline text-sm">Menú</span>
+            </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Menu" className="p-3">
             <DropdownSection showDivider aria-label="Profile & Actions">
@@ -77,6 +134,16 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 <DropdownItem key="dashboard">
                   <NextLink href="/admin" className="text-current">
                     Admin Dashboard
+                  </NextLink>
+                </DropdownItem>
+                <DropdownItem key="invitations">
+                  <NextLink href="/admin/invitations" className="text-current">
+                    Gestionar Invitaciones
+                  </NextLink>
+                </DropdownItem>
+                <DropdownItem key="feedbacks">
+                  <NextLink href="/admin/feedbacks" className="text-current">
+                    Feedback de Usuarios
                   </NextLink>
                 </DropdownItem>
                 <DropdownItem
@@ -100,6 +167,12 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
               </DropdownSection>
             ) : null}
             <DropdownSection aria-label="Help & Feedback">
+              <DropdownItem 
+                key="show_onboarding" 
+                onPress={() => window.dispatchEvent(new CustomEvent('show-onboarding'))}
+              >
+                Ver guía de inicio
+              </DropdownItem>
               <DropdownItem key="terms_and_conditions" href="/policies">
                 <HeroUILink href="/policies">Terms & Condition</HeroUILink>
               </DropdownItem>
