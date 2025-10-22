@@ -4,6 +4,7 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { UserDataSync } from '../components/auth/UserDataSync';
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -15,6 +16,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <HeroUIProvider navigate={navigate} useHref={useHref}>
       <UserProvider>
         <div className="relative min-h-screen">
+          <UserDataSync />
           <ToastProvider
             placement="top-center"
             toastProps={{

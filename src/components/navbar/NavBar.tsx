@@ -4,7 +4,7 @@ import {
   NavbarBrand,
   NavbarContent,
   Avatar,
-  Link,
+  Link as HeroUILink,
   Switch,
   Dropdown,
   DropdownItem,
@@ -71,11 +71,14 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 <p className="font-semibold text-white-100">{user?.name}</p>
                 <p className="text-xs">{user?.email}</p>
               </DropdownItem>
-              {/* <DropdownItem key="dashboard">Dashboard</DropdownItem>
-              <DropdownItem key="settings">Settings</DropdownItem> */}
             </DropdownSection>
             {checkUserIsAdmin(user?.email || '') ? (
-              <DropdownSection aria-label="Admin Mode">
+              <DropdownSection aria-label="Admin Mode" showDivider>
+                <DropdownItem key="dashboard">
+                  <NextLink href="/admin" className="text-current">
+                    Admin Dashboard
+                  </NextLink>
+                </DropdownItem>
                 <DropdownItem
                   key="admin_mode"
                   closeOnSelect={false}
@@ -98,15 +101,15 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
             ) : null}
             <DropdownSection aria-label="Help & Feedback">
               <DropdownItem key="terms_and_conditions" href="/policies">
-                <Link href="/policies">Terms & Condition</Link>
+                <HeroUILink href="/policies">Terms & Condition</HeroUILink>
               </DropdownItem>
               <DropdownItem key="logout">
-                <Link href="/api/auth/logout" color="danger">
+                <HeroUILink href="/api/auth/logout" color="danger">
                   Log Out
-                </Link>
+                </HeroUILink>
               </DropdownItem>
               <DropdownItem key="back_home">
-                <Link href="/" color='danger'>Exit</Link>
+                <HeroUILink href="/" color='danger'>Exit</HeroUILink>
               </DropdownItem>
             </DropdownSection>
           </DropdownMenu>
