@@ -96,6 +96,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             specialCondition: p.specialCondition,
             traits: p.traits,
             joking: p.joking,
+            jokeStyle: p.jokeStyle,
             userDateOfBirth: n.dateOfBirth,
             userDateOfDeath: n.dateOfDeath,
             userAnimicState: n.animicState,

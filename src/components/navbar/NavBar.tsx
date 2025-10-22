@@ -71,8 +71,8 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 <p className="font-semibold text-white-100">{user?.name}</p>
                 <p className="text-xs">{user?.email}</p>
               </DropdownItem>
-              <DropdownItem key="dashboard">Dashboard</DropdownItem>
-              <DropdownItem key="settings">Settings</DropdownItem>
+              {/* <DropdownItem key="dashboard">Dashboard</DropdownItem>
+              <DropdownItem key="settings">Settings</DropdownItem> */}
             </DropdownSection>
             {checkUserIsAdmin(user?.email || '') ? (
               <DropdownSection aria-label="Admin Mode">
