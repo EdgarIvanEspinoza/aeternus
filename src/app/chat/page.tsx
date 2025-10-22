@@ -5,12 +5,14 @@ import { Chat } from '@components/chat/Chat';
 import NavBar from '@components/navbar/NavBar';
 import { useDisclosure } from '@heroui/react';
 import { LoginModal } from '@components/modal/LoginModal';
+import { isUserAllowed } from '../../config/alpha-access';
 
 const ChatPage = (): ReactElement => {
   const { user, isLoading } = useUser();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [adminMode, setAdminMode] = useState<boolean>(false);
   const [jacquesMode, setJacquesMode] = useState<boolean>(false);
+  const [isAllowed, setIsAllowed] = useState<boolean>(false);
 
   useEffect(() => {
     const adminModeFromStorage = localStorage.getItem('adminMode');
@@ -25,6 +27,9 @@ const ChatPage = (): ReactElement => {
         onOpen();
       } else {
         onClose();
+        // Check if user's email is in the allowed list
+        const allowed = isUserAllowed(user.email);
+        setIsAllowed(allowed);
       }
     }
   }, [user, isLoading]);
@@ -47,7 +52,34 @@ const ChatPage = (): ReactElement => {
           }}
         />
         <main className="flex-1 flex flex-col items-center w-full pt-14">
-          {!isLoading && user && <Chat jacquesMode={jacquesMode} adminMode={adminMode} />}
+          {!isLoading && user && isAllowed && (
+            <Chat jacquesMode={jacquesMode} adminMode={adminMode} />
+          )}
+          {!isLoading && user && !isAllowed && (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto">
+              <div className="bg-zinc-900/60 p-8 rounded-xl border border-zinc-800 shadow-2xl text-center">
+                <h2 className="text-2xl font-bold mb-4">Alpha Test Access Required</h2>
+                <p className="mb-6">
+                  Hello <span className="font-semibold">{user.email}</span>,
+                </p>
+                <p className="mb-4">
+                  This application is currently in alpha testing phase and requires special access.
+                </p>
+                <p className="mb-6">
+                  Your email is not currently on our alpha test access list. If you believe this is an error or 
+                  would like to request access, please contact the administrator.
+                </p>
+                <div className="flex justify-center">
+                  <a 
+                    href="/"
+                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+                  >
+                    Return Home
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
       <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
