@@ -17,9 +17,12 @@ export async function POST(req: Request) {
 
     // Validar los datos recibidos
     if (!host || !user || !password) {
-      return NextResponse.json({ 
-        error: 'Missing required SMTP configuration fields' 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Missing required SMTP configuration fields',
+        },
+        { status: 400 }
+      );
     }
 
     // Crear contenido para el archivo .env.local
@@ -37,16 +40,19 @@ ${fromEmail ? `SMTP_FROM_EMAIL="${fromEmail}"` : ''}
     const envPath = path.join(process.cwd(), '.env.local');
     await fs.writeFile(envPath, envContent);
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'SMTP configuration saved successfully' 
+    return NextResponse.json({
+      success: true,
+      message: 'SMTP configuration saved successfully',
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error saving SMTP configuration:', error);
-    return NextResponse.json({ 
-      error: 'Failed to save SMTP configuration', 
-      details: errorMessage 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to save SMTP configuration',
+        details: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }

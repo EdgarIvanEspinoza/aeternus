@@ -13,16 +13,16 @@ export async function sendMail({ to, subject, text, html }: EmailParams) {
     const smtpHost = process.env.SMTP_HOST;
     const smtpUser = process.env.SMTP_USER;
     const smtpPassword = process.env.SMTP_PASSWORD;
-    
+
     if (!smtpHost || !smtpUser || !smtpPassword) {
-      console.error('Missing SMTP configuration:', { 
+      console.error('Missing SMTP configuration:', {
         host: smtpHost ? 'defined' : 'missing',
         user: smtpUser ? 'defined' : 'missing',
-        password: smtpPassword ? 'defined' : 'missing'
+        password: smtpPassword ? 'defined' : 'missing',
       });
       throw new Error('Missing SMTP configuration. Please check your environment variables.');
     }
-    
+
     // Configuración del transporte de correo
     const transporter = nodemailer.createTransport({
       host: smtpHost,

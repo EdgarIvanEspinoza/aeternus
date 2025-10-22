@@ -62,16 +62,19 @@ export async function POST(req: Request) {
     process.env.SMTP_PASSWORD = originalEnv.SMTP_PASSWORD;
     process.env.SMTP_FROM_EMAIL = originalEnv.SMTP_FROM_EMAIL;
 
-    return NextResponse.json({ 
-      success: true, 
-      message: `Email de prueba enviado a ${testEmail}` 
+    return NextResponse.json({
+      success: true,
+      message: `Email de prueba enviado a ${testEmail}`,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error sending test email:', error);
-    return NextResponse.json({ 
-      error: 'Failed to send test email', 
-      details: errorMessage 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to send test email',
+        details: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }

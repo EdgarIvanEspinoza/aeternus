@@ -69,9 +69,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error sending invitation:', error);
-    return NextResponse.json({ 
-      error: 'Failed to send invitation', 
-      details: errorMessage 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to send invitation',
+        details: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }
