@@ -183,6 +183,7 @@ export const Chat = ({
                     message={message}
                     role={message.role}
                     username={jacquesMode ? 'Jacques Schwartzman' : (impersonatedUser?.name || getNameAndFamilyFromUser(user))}
+                    impersonating={!!impersonatedUser}
                   />
                 ))}
               <div ref={messagesEndRef} />

@@ -21,12 +21,14 @@ interface ChatMessageProps {
   };
   role: 'data' | 'user' | 'assistant' | 'system';
   username: string | null | undefined;
+  impersonating?: boolean; // when true, force placeholder avatar for user
 }
 
 export const ChatMessage = ({
   message,
   role,
   username,
+  impersonating = false,
 }: ChatMessageProps) => {
   const [QuantumReady, setQuantumReady] = useState(false);
   const { user } = useUser();
@@ -113,7 +115,8 @@ export const ChatMessage = ({
               isBordered
               as="button"
               color="success"
-              src={user?.picture || 'https://www.gravatar.com/avatar?d=mp'}
+              // If impersonating, leave src empty so HeroUI renders its placeholder
+              src={impersonating ? '' : (user?.picture || 'https://www.gravatar.com/avatar?d=mp')}
               alt="user-avatar"
               size="sm"
             />
