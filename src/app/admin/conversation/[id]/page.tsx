@@ -111,6 +111,43 @@ const ConversationPage = ({ params }: { params: { id: string } }) => {
             >
               Logout
             </a>
+            {conversation && (
+              <button
+                onClick={async () => {
+                  if (!confirm('Delete entire conversation?')) return;
+                  const res = await fetch(`/api/admin/conversation/delete?conversationId=${conversation.id}&userId=${conversation.user?.id}`, { method: 'DELETE' });
+                  if (res.ok) {
+                    router.push('/admin');
+                  } else {
+                    alert('Failed to delete');
+                  }
+                }}
+                className="px-4 py-2 bg-red-900/50 hover:bg-red-800/50 rounded-md transition-colors"
+              >
+                Delete Conversation
+              </button>
+            )}
+            {conversation && (
+              <button
+                onClick={async () => {
+                  if (!conversation.user?.id) return;
+                  if (!confirm('Create new empty conversation for this user?')) return;
+                  const res = await fetch('/api/admin/conversation/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: conversation.user.id })
+                  });
+                  if (res.ok) {
+                    router.push('/admin');
+                  } else {
+                    alert('Failed to create');
+                  }
+                }}
+                className="px-4 py-2 bg-emerald-900/50 hover:bg-emerald-800/50 rounded-md transition-colors"
+              >
+                New Empty Conversation
+              </button>
+            )}
           </div>
         </div>
         

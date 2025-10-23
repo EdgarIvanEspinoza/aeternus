@@ -199,12 +199,46 @@ const Dashboard = () => {
                             </div>
                           </td>
                           <td className="py-4 text-right">
-                            <Link 
-                              href={`/admin/conversation/${conversation.conversationId}`} 
-                              className="px-3 py-1 bg-indigo-900/50 hover:bg-indigo-800/50 rounded text-sm transition-colors"
-                            >
-                              View
-                            </Link>
+                            <div className="flex justify-end gap-2">
+                              <Link 
+                                href={`/admin/conversation/${conversation.conversationId}`} 
+                                className="px-3 py-1 bg-indigo-900/50 hover:bg-indigo-800/50 rounded text-sm transition-colors"
+                              >
+                                View
+                              </Link>
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('Delete this conversation?')) return;
+                                  const res = await fetch(`/api/admin/conversation/delete?conversationId=${conversation.conversationId}&userId=${conversation.userId}`, { method: 'DELETE' });
+                                  if (res.ok) {
+                                    fetchConversations(pagination.page);
+                                  } else {
+                                    alert('Failed to delete');
+                                  }
+                                }}
+                                className="px-3 py-1 bg-red-900/50 hover:bg-red-800/50 rounded text-sm transition-colors"
+                              >
+                                Delete
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('Create a new empty conversation for this user?')) return;
+                                  const res = await fetch('/api/admin/conversation/create', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ userId: conversation.userId })
+                                  });
+                                  if (res.ok) {
+                                    fetchConversations(pagination.page);
+                                  } else {
+                                    alert('Failed to create');
+                                  }
+                                }}
+                                className="px-3 py-1 bg-emerald-900/50 hover:bg-emerald-800/50 rounded text-sm transition-colors"
+                              >
+                                New Empty
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
