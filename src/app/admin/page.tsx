@@ -106,32 +106,45 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-black text-white p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <div className="flex gap-4">
-            <Link 
-              href="/admin/feedbacks" 
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-pink-400 to-purple-500 bg-clip-text text-transparent">
+              Admin Dashboard
+            </h1>
+            <p className="mt-2 text-sm text-gray-400 max-w-md">
+              Panel de supervisión y gestión. Visualiza conversaciones recientes y accede a herramientas administrativas.
+            </p>
+          </div>
+          <div className="inline-flex flex-wrap gap-3">
+            <Link
+              href="/admin/feedbacks"
+              className="group relative px-4 py-2 rounded-md border border-indigo-600/50 bg-gradient-to-r from-indigo-600/20 to-indigo-500/10 hover:from-indigo-600/30 hover:to-indigo-500/20 transition-colors overflow-hidden"
             >
-              Ver Feedbacks
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-indigo-600 to-purple-600 blur-xl transition-opacity" />
+              <span className="relative flex items-center gap-2 text-indigo-300 group-hover:text-indigo-200 text-sm font-medium">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="opacity-80"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12l9-5-9-5-9 5 9 5z"/></svg>
+                Feedbacks
+              </span>
             </Link>
-            <Link 
-              href="/admin/invitations" 
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+            <Link
+              href="/admin/invitations"
+              className="group relative px-4 py-2 rounded-md border border-pink-600/50 bg-gradient-to-r from-pink-600/20 to-pink-500/10 hover:from-pink-600/30 hover:to-pink-500/20 transition-colors overflow-hidden"
             >
-              Gestionar Invitaciones
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-pink-600 to-fuchsia-600 blur-xl transition-opacity" />
+              <span className="relative flex items-center gap-2 text-pink-300 group-hover:text-pink-200 text-sm font-medium">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="opacity-80"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+                Invitaciones
+              </span>
             </Link>
-            <Link 
-              href="/admin/smtp-config" 
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
+            <Link
+              href="/admin/smtp-config"
+              className="group relative px-4 py-2 rounded-md border border-purple-600/50 bg-gradient-to-r from-purple-600/20 to-purple-500/10 hover:from-purple-600/30 hover:to-purple-500/20 transition-colors overflow-hidden"
             >
-              Config. SMTP
-            </Link>
-            <Link 
-              href="/chat" 
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
-            >
-              Ir al Chat
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-purple-600 to-indigo-600 blur-xl transition-opacity" />
+              <span className="relative flex items-center gap-2 text-purple-300 group-hover:text-purple-200 text-sm font-medium">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className="opacity-80"><path d="M12 2l7 4v6c0 5-3.5 9.74-7 10-3.5-.26-7-5-7-10V6l7-4z"/></svg>
+                SMTP
+              </span>
             </Link>
           </div>
         </div>
