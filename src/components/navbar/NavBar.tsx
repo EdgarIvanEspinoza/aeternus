@@ -20,6 +20,8 @@ import { checkUserIsAdmin } from '@utils/main.utils';
 import { ResetConversationButton } from './DeleteConversationButton';
 import { CloseSessionButton } from './CloseSessionButton';
 import { MenuIcon, MessageSquarePlus, MessageCircle, LayoutDashboard } from 'lucide-react';
+import { useImpersonation } from '../../context/ImpersonationContext';
+import { ImpersonationModal } from '@components/admin/ImpersonationModal';
 
 type Props = {
   adminMode: boolean;
@@ -31,6 +33,8 @@ type Props = {
 const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode }: Props) => {
   const { user } = useUser();
   const [isChat, setIsChat] = React.useState(false);
+  const { impersonatedUser, clearImpersonation } = useImpersonation();
+  const [impersonationOpen, setImpersonationOpen] = React.useState(false);
   
   React.useEffect(() => {
     setIsChat(window.location.pathname.startsWith('/chat'));
@@ -82,6 +86,17 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           >
             <span className="hidden sm:inline">Dashboard</span>
             <span className="sm:hidden">Admin</span>
+          </Button>
+        )}
+        {isChat && checkUserIsAdmin(user?.email || '') && (
+          <Button
+            color="secondary"
+            variant={impersonatedUser ? 'solid' : 'flat'}
+            aria-label="Impersonar usuario"
+            className="mr-2"
+            onPress={() => setImpersonationOpen(true)}
+          >
+            {impersonatedUser ? 'Impersonando…' : 'Impersonar'}
           </Button>
         )}
         
@@ -136,6 +151,14 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                     Admin Dashboard
                   </NextLink>
                 </DropdownItem>
+                <DropdownItem key="impersonate" onPress={() => setImpersonationOpen(true)}>
+                  {impersonatedUser ? `Impersonando: ${impersonatedUser.name}` : 'Impersonar usuario'}
+                </DropdownItem>
+                {impersonatedUser && (
+                  <DropdownItem key="stop_impersonation" color="warning" onPress={() => clearImpersonation()}>
+                    Salir de impersonación
+                  </DropdownItem>
+                )}
                 <DropdownItem key="feedbacks">
                   <NextLink href="/admin/feedbacks" className="text-current">
                     Feedback de Usuarios
@@ -183,6 +206,8 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           </DropdownMenu>
         </Dropdown>
       </NavbarContent>
+      {/* Modal de Impersonación */}
+      <ImpersonationModal isOpen={impersonationOpen} onOpenChange={setImpersonationOpen} />
     </Navbar>
   );
 };

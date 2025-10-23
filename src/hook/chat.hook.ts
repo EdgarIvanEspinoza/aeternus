@@ -5,6 +5,7 @@ import config from './config/chat.hook.config';
 import { getCurrentAge } from '../utils/jsonToSentence';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useImpersonation } from '../context/ImpersonationContext';
 
 const ChatHook = (
   username: string | null | undefined
@@ -17,8 +18,20 @@ const ChatHook = (
   loading: boolean;
   savingMessages: boolean;
 } => {
-  const conversationId = useRef(localStorage.getItem('conversationId') || uuidv4());
-  localStorage.setItem('conversationId', conversationId.current);
+  const { impersonatedUser } = useImpersonation();
+  const baseConversationKey = impersonatedUser ? `conversationId:${impersonatedUser.id}` : 'conversationId:real';
+  const conversationId = useRef<string>('');
+
+  // Inicializa o recupera conversationId específico
+  if (!conversationId.current) {
+    const existing = localStorage.getItem(baseConversationKey);
+    if (existing) {
+      conversationId.current = existing;
+    } else {
+      conversationId.current = uuidv4();
+      localStorage.setItem(baseConversationKey, conversationId.current);
+    }
+  }
 
   const { user } = useUser();
   const [initialMessages, setInitialMessages] = useState<Message[] | null>(null);
@@ -26,14 +39,15 @@ const ChatHook = (
   const [savingMessages, setSavingMessages] = useState(false);
 
   const saveMessage = async (role: 'user' | 'assistant' | 'system', content: string) => {
-    if (!user?.sub) return;
+    const effectiveUserId = impersonatedUser?.id || user?.sub;
+    if (!effectiveUserId) return;
     setSavingMessages(true);
     try {
       await fetch('/api/chat/saveMessage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.sub,
+          userId: effectiveUserId,
           conversationId: conversationId.current,
           role,
           content,
@@ -48,7 +62,9 @@ const ChatHook = (
 
   const fetchTraits = async () => {
     try {
-      const queryParams = username ? `?user=${encodeURIComponent(username)}` : '';
+      // Override username with impersonated name if available
+      const effectiveName = impersonatedUser?.name || username;
+      const queryParams = effectiveName ? `?user=${encodeURIComponent(effectiveName)}` : '';
       const res = await fetch(`/api/ai/traits${queryParams}`);
       if (!res.ok) throw new Error('Server error');
       const data = await res.json();
@@ -148,15 +164,35 @@ const ChatHook = (
     return sections.join('\n');
   }
 
+  // Detectar cambio de usuario impersonado y preparar nuevo conversationId si hace falta
+  const lastImpersonatedId = useRef<string | null>(null);
+  useEffect(() => {
+    if (lastImpersonatedId.current !== impersonatedUser?.id) {
+      // Si cambia
+      lastImpersonatedId.current = impersonatedUser?.id || null;
+      const key = impersonatedUser ? `conversationId:${impersonatedUser.id}` : 'conversationId:real';
+      const existing = localStorage.getItem(key);
+      if (!existing) {
+        const newId = uuidv4();
+        localStorage.setItem(key, newId);
+        conversationId.current = newId;
+        setInitialMessages([]); // fuerza prompt nuevo
+      } else {
+        conversationId.current = existing;
+      }
+    }
+  }, [impersonatedUser?.id]);
+
   useEffect(() => {
     const initializeMessages = async () => {
-      if (!user?.sub) return;
+      const effectiveUserId = impersonatedUser?.id || user?.sub;
+      if (!effectiveUserId) return;
       setLoading(true);
       const [traits, msgRes] = await Promise.all([
         fetchTraits(),
         fetch('/api/chat/loadMessages', {
           method: 'POST',
-          body: JSON.stringify({ userId: user.sub }),
+          body: JSON.stringify({ userId: effectiveUserId, conversationId: conversationId.current }),
         }),
       ]);
 
@@ -393,7 +429,7 @@ ${
     };
 
     initializeMessages();
-  }, [user?.sub, username]);
+  }, [user?.sub, impersonatedUser?.id, impersonatedUser?.name, username, conversationId.current]);
 
   const { messages, input, handleInputChange, handleSubmit, append } = useChat({
     initialMessages: initialMessages ?? [],

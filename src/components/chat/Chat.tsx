@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
 import ChatHook from '../../hook/chat.hook';
+import { useImpersonation } from '../../context/ImpersonationContext';
 import { ChatMessage } from './ChatMessage/ChatMessage';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { getNameAndFamilyFromUser, getNameFromUser } from '@utils/main.utils';
 import { AlphaInfoModal } from '@components/modal/AlphaInfoModal';
+import { ConversationDebugBadge } from './ConversationDebugBadge';
 
 export const Chat = ({
   jacquesMode,
@@ -14,7 +16,9 @@ export const Chat = ({
   adminMode: boolean;
 }): React.ReactElement => {
   const { user } = useUser();
-  const { messages, input, handleInputChange, handleSubmit, loading } = ChatHook(jacquesMode ? 'Jacques' : getNameFromUser(user));
+  const { impersonatedUser } = useImpersonation();
+  const effectiveName = impersonatedUser?.name || (jacquesMode ? 'Jacques' : getNameFromUser(user));
+  const { messages, input, handleInputChange, handleSubmit, loading } = ChatHook(effectiveName);
   const [showAlphaModal, setShowAlphaModal] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -156,6 +160,12 @@ export const Chat = ({
   return (
     <>
       <div className="relative flex-1 w-full flex flex-col items-center">
+        {impersonatedUser && (
+          <div className="absolute top-2 left-4 z-30 bg-pink-600/20 border border-pink-500/40 text-pink-200 text-[11px] px-2 py-1 rounded">
+            Impersonando: {impersonatedUser.name || impersonatedUser.email}
+          </div>
+        )}
+        <ConversationDebugBadge />
         {loading ? (
           <div className="flex items-center justify-center flex-1 h-full w-full">
             <div className="loader">
@@ -168,7 +178,12 @@ export const Chat = ({
               {messages
                 .filter((msg) => (adminMode ? true : msg.role !== 'system'))
                 .map((message) => (
-                  <ChatMessage key={message.id} message={message} role={message.role} username={jacquesMode ? 'Jacques Schwartzman' : getNameAndFamilyFromUser(user)} />
+                  <ChatMessage
+                    key={message.id}
+                    message={message}
+                    role={message.role}
+                    username={jacquesMode ? 'Jacques Schwartzman' : (impersonatedUser?.name || getNameAndFamilyFromUser(user))}
+                  />
                 ))}
               <div ref={messagesEndRef} />
             </div>

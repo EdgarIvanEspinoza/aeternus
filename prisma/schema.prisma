@@ -32,6 +32,8 @@ model ChatMessage {
   content        String
   createdAt      DateTime @default(now())
   conversationId String
+
+  @@index([userId, conversationId])
 }
 
 model Feedback {

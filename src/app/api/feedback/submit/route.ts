@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
+import { isAdminUser } from '@config/admin-access';
 import { prisma } from '@lib/prisma';
 
 export async function POST(req: Request) {
@@ -8,7 +9,7 @@ export async function POST(req: Request) {
     const session = await getSession();
 
     // Obtener datos de la solicitud
-    const { type, content, userId, userEmail } = await req.json();
+    const { type, content, userId, userEmail, impersonated } = await req.json();
 
     // Validar datos
     if (!type || !content) {
@@ -16,13 +17,16 @@ export async function POST(req: Request) {
     }
 
     // Guardar feedback en la base de datos
+    let finalUserId = userId || session?.user?.sub || 'anonymous';
+    let finalUserEmail = userEmail || session?.user?.email || 'anonymous';
+    // Si viene bandera impersonated y el usuario de la sesión es admin, aceptamos override explícito
+    if (impersonated && session?.user?.email && isAdminUser(session.user.email) && userId && userEmail) {
+      finalUserId = userId;
+      finalUserEmail = userEmail;
+    }
+
     const feedback = await prisma.feedback.create({
-      data: {
-        type,
-        content,
-        userId: userId || session?.user?.sub || 'anonymous',
-        userEmail: userEmail || session?.user?.email || 'anonymous',
-      },
+      data: { type, content, userId: finalUserId, userEmail: finalUserEmail },
     });
 
     return NextResponse.json({
