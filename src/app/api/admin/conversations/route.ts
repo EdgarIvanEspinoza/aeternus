@@ -66,8 +66,15 @@ export async function GET(req: Request) {
     const total = conversationsArray.length;
     const paginatedConversations = conversationsArray.slice(skip, skip + limit);
 
-    // Get user data for all conversations
-    const userIds = [...new Set(paginatedConversations.map(c => c.userId))];
+    // Get unique user ids without using Set iteration spread (compat with lower TS target)
+    const userIdsArray = paginatedConversations.map(c => c.userId);
+    const userIds: string[] = [];
+    for (let i = 0; i < userIdsArray.length; i++) {
+      const id = userIdsArray[i];
+      if (userIds.indexOf(id) === -1) {
+        userIds.push(id);
+      }
+    }
     const users = await prisma.user.findMany({
       where: {
         id: { in: userIds }
@@ -95,9 +102,10 @@ export async function GET(req: Request) {
     });
 
     // For each conversation, get the first user message and first AI response
+    interface ChatMsg { role: string; content: string; }
     const conversationsWithSamples = conversationsWithUsers.map(conv => {
-      const userMessage = conv.messages.find(m => m.role === 'user');
-      const aiMessage = conv.messages.find(m => m.role === 'assistant');
+      const userMessage = (conv.messages as ChatMsg[]).find(m => m.role === 'user');
+      const aiMessage = (conv.messages as ChatMsg[]).find(m => m.role === 'assistant');
       
       return {
         ...conv,

@@ -3,13 +3,15 @@ import { Providers } from './providers';
 
 export const metadata = {
   title: '🐲Aeternus AI',
-  description: 'Generated example of using Aeternus AI',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+  description: 'Generated example of using Aeternus AI'
+};
+
+// Separar viewport según API moderna de Next.js
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

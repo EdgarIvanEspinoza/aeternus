@@ -6,10 +6,10 @@ export async function POST(req: Request) {
   try {
     // Verificar autenticación (hacemos opcional la autenticación para permitir feedback anónimo)
     const session = await getSession();
-    
+
     // Obtener datos de la solicitud
     const { type, content, userId, userEmail } = await req.json();
-    
+
     // Validar datos
     if (!type || !content) {
       return NextResponse.json({ error: 'Type and content are required' }, { status: 400 });
@@ -20,20 +20,23 @@ export async function POST(req: Request) {
       data: {
         type,
         content,
-        userId: userId || (session?.user?.sub || 'anonymous'),
-        userEmail: userEmail || (session?.user?.email || 'anonymous'),
+        userId: userId || session?.user?.sub || 'anonymous',
+        userEmail: userEmail || session?.user?.email || 'anonymous',
       },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      feedback 
+    return NextResponse.json({
+      success: true,
+      feedback,
     });
   } catch (error) {
     console.error('Error submitting feedback:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to submit feedback' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to submit feedback',
+      },
+      { status: 500 }
+    );
   }
 }

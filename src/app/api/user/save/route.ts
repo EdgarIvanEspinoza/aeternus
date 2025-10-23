@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       where: { email },
       update: {
         name,
-        picture
+        picture,
       },
       create: {
         id: sub,
