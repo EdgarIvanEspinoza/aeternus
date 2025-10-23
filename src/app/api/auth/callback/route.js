@@ -25,3 +25,6 @@ export async function GET(req) {
     );
   }
 }
+
+// Dynamic: uses cookies/session (Auth0)
+export const dynamic = 'force-dynamic';

@@ -9,3 +9,6 @@ export async function GET(req) {
     throw error;
   }
 }
+
+// Dynamic: manipulates auth cookies
+export const dynamic = 'force-dynamic';
