@@ -45,13 +45,6 @@ model Feedback {
   adminNotes String?
 }
 
-model Invitation {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  status     String   @default("pending") // pending, sent, accepted
-  createdAt  DateTime @default(now())
-  lastSentAt DateTime?
-}
 
 model ChatSession {
   userId         String

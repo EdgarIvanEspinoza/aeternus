@@ -136,11 +136,6 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                     Admin Dashboard
                   </NextLink>
                 </DropdownItem>
-                <DropdownItem key="invitations">
-                  <NextLink href="/admin/invitations" className="text-current">
-                    Gestionar Invitaciones
-                  </NextLink>
-                </DropdownItem>
                 <DropdownItem key="feedbacks">
                   <NextLink href="/admin/feedbacks" className="text-current">
                     Feedback de Usuarios

@@ -6,7 +6,6 @@ Aeternus es una plataforma de chat con IA diseñada para proporcionar conversaci
 
 - **Sistema de Onboarding Progresivo**: Guía a los usuarios paso a paso a través de las funcionalidades clave.
 - **Sistema de Feedback para usuarios Alpha**: Permite a los usuarios compartir opiniones y reportar problemas.
-- **Sistema de Manejo de Invitaciones**: Control completo para gestionar invitaciones a usuarios alpha.
 - **Optimización de Chat**: Caché local para mejorar rendimiento y recuperación de conversaciones.
 - **Panel de Administración**: Control de usuarios y conversaciones para administradores.
 
@@ -85,7 +84,6 @@ Aeternus es una plataforma de chat con IA diseñada para proporcionar conversaci
 El panel de administración permite:
 
 - Ver todas las conversaciones almacenadas
-- Gestionar invitaciones para usuarios alpha
 - Monitorear feedback de usuarios
 - Configurar aspectos del sistema
 
