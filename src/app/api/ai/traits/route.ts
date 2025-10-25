@@ -61,7 +61,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         [x IN userFriends WHERE x IN aiFriends] AS commonFriends
 
       // Parental relations of the user (excluding the active AI)
-      OPTIONAL MATCH (n)-[prRel]-(relative:Person)
+      OPTIONAL MATCH (n)-[prRel]->(relative:Person)
       WHERE prRel.name = 'Parental' AND relative.name <> p.name
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
         collect(DISTINCT { name: relative.name, relation: type(prRel) }) AS userParentalRelations
@@ -92,6 +92,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             profession: p.profession,
             relationships: relationships,
             rolCharacter: p.rolCharacter,
+            lang: p.lang,
             rutine: p.rutine,
             specialCondition: p.specialCondition,
             traits: p.traits,

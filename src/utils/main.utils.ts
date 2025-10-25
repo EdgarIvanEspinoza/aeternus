@@ -30,31 +30,4 @@ const toNumber = (val: unknown): number => {
   return isNaN(coerced) ? 0 : coerced;
 };
 
-type RespectLevel = 'low' | 'medium' | 'high';
-
-interface RespectRule {
-  condition: (aiAge: number, userAge: number) => boolean;
-  respect: RespectLevel;
-}
-
-const respectRules: RespectRule[] = [
-  {
-    condition: (ai, user) => Math.abs(ai - user) <= 5,
-    respect: 'high', // casi contemporáneos → más naturalidad, más cercanía
-  },
-  {
-    condition: (ai, user) => ai > user,
-    respect: 'medium', // IA mayor que el user → tono más mentor / protector
-  },
-  {
-    condition: (ai, user) => ai < user,
-    respect: 'low', // IA más joven → tono más deferente, aprendiz
-  },
-];
-
-function getRespect(aiAge: number, userAge: number): RespectLevel {
-  const rule = respectRules.find((r) => r.condition(aiAge, userAge));
-  return rule ? rule.respect : 'medium';
-}
-
-export { checkUserIsAdmin, getNameFromUser, toNumber, getRespect, getNameAndFamilyFromUser };
+export { checkUserIsAdmin, getNameFromUser, toNumber, getNameAndFamilyFromUser };
