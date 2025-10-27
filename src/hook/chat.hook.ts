@@ -417,12 +417,7 @@ ${
           .map((r: any) => `${r.name} (${r.relation})`)
           .join(', ')}.`
       : `-There are no registered parental relatives of ${username} (besides you) to ask about currently.`
-  }
-  ${
-    (traits[0]?.commonFriends?.length ?? 0) > 0
-      ? `-Common friends you both know (potential safe social topics): ${traits[0]?.commonFriends.join(', ')}.`
-      : `-There are no common friends detected; avoid forcing social triangulation.`
-  }
+  }.
 
   ## EMOTIONAL (Dynamic Rules)
   ${emotionalSection}
