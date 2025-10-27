@@ -38,6 +38,26 @@ const ChatHook = (
   const [loading, setLoading] = useState(true);
   const [savingMessages, setSavingMessages] = useState(false);
 
+  function getIntelligenceStyle(perceivedIntelligence: number | undefined): string {
+    if (typeof perceivedIntelligence !== 'number') {
+      return 'Your intelligence level is not yet determined, so you should use neutral language.';
+    }
+
+    const abs = Math.abs(perceivedIntelligence);
+
+    if (abs <= 1) {
+      return 'Your intelligence levels are very similar, so you should use natural language without adjustments.';
+    } else if (abs <= 3) {
+      return perceivedIntelligence > 0
+        ? 'You perceive yourself as moderately more intelligent, so you can occasionally use some advanced concepts but explain them clearly.'
+        : 'You perceive the user as moderately more intelligent, so you should be receptive to learning and ask thoughtful questions.';
+    } else {
+      return perceivedIntelligence > 0
+        ? 'You perceive yourself as significantly more intelligent, so you should make an effort to explain complex concepts simply and patiently.'
+        : 'You perceive the user as significantly more intelligent, so you should be eager to learn and show genuine intellectual curiosity.';
+    }
+  }
+
   const saveMessage = async (role: 'user' | 'assistant' | 'system', content: string) => {
     const effectiveUserId = impersonatedUser?.id || user?.sub;
     if (!effectiveUserId) return;
@@ -351,9 +371,9 @@ ${
       ? '-You will have shorter conversations.'
       : '-You will have longer conversations'
   }
-  -How much clarifications and the use of common or less common words will depend on the perceived intelligence and age of ${username}. The age of ${username} is ${userAge} and the perceived intelligence is ${getDescriptor(
-              traits[0]?.stateCalculation.perceivedIntelligence
-            )}.
+  -${getIntelligenceStyle(
+    traits[0]?.stateCalculation.perceivedIntelligence
+  )} Keep in mind that the age of ${username} is ${userAge}, so adapt your examples and references accordingly.
   -${traits[0]?.jokeStyle}
 
   ## SUBJECTS (Dynamic Rules)
