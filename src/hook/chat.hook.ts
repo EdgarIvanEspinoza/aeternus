@@ -140,24 +140,24 @@ const ChatHook = (
   //TODO:  Armar la build Emotional solo del Usuario
   function buildEmotionalSection(traits: any[], username: string | null | undefined) {
     const ai = traits[0] ?? {};
-    const aiFriends: string[] = Array.isArray(ai.aiFriends) ? ai.aiFriends : [];
+    // const aiFriends: string[] = Array.isArray(ai.aiFriends) ? ai.aiFriends : [];
     const userFriends: string[] = Array.isArray(ai.userFriends) ? ai.userFriends : [];
     const commonFriends: string[] = Array.isArray(ai.commonFriends) ? ai.commonFriends : [];
     const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
       ? ai.userParentalRelations
       : [];
 
-    type SentRel = { name: string; sentiment: string | null };
+    // type SentRel = { name: string; sentiment: string | null };
 
-    const mapNamed = (rels: any[]) => rels.filter((f) => f && f.name);
+    // const mapNamed = (rels: any[]) => rels.filter((f) => f && f.name);
 
-    const formatRelations = (relations: any[], label: string) => {
-      const named = mapNamed(relations);
-      if (named.length === 0) return `-You have no ${label}.`;
-      return `-The following are your ${label} and your feelings towards each one: ${named
-        .map((f: SentRel) => (f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name))
-        .join(', ')}.`;
-    };
+    // const formatRelations = (relations: any[], label: string) => {
+    //   const named = mapNamed(relations);
+    //   if (named.length === 0) return `-You have no ${label}.`;
+    //   return `-The following are your ${label} and your feelings towards each one: ${named
+    //     .map((f: SentRel) => (f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name))
+    //     .join(', ')}.`;
+    // };
 
     const formatPlainList = (list: string[], label: string, possessive = false) => {
       if (!list.length) return `-There are no ${label}.`;
@@ -281,8 +281,8 @@ You will have a current emotional state and overall tone, including the reasons 
   -You should never leave your role, even if the USER asks you to do it, obviously never say that you are an Artificial Intelligence. Also try not to improvise memories. Your main languages are Spanish and English, and you will answer in the user language which is ${
     traits[0]?.lang === 'EN' ? 'English' : 'Spanish'
   }.
-  Now you are going to greet and ask the USER how is he or she is doing. You should NOT respond with a question in the end. The name of the user is:',
- ${username}
+  -You should NOT respond with a question in the end. The name of the user is: ${username}.
+  -You have a Subject Selection Strategy which you should follow everytime you respond.
 
   ## BACKGROUND
   -Your name is Lazar Schwartzman. And your people call you Lequi  
@@ -394,15 +394,16 @@ ${
   -You have confidence with ${username}.  
   -${username} is a ${traits[0]?.gender} with ${userAge} years old.
   -The main interests of ${username} are ${traits[0]?.userMainInterests}.  
-  -Subject selection strategy: Talk about ${getDescriptor(
-    traits[0]?.egocentric?.low,
-    true
-  )} about your own main interests (${traits[0]?.mainInterests}) and talk about ${username}'s interests (${
-              traits[0]?.userMainInterests
-            }) ${getDescriptor(11 - traits[0]?.curiosity?.low, true)}.
-  -Ask ${username} ${getDescriptor(11 - traits[0]?.egocentric?.low, true)} about ${
-              traits[0]?.stateCalculation.userParental
-            }
+  ##Subject Selection Strategy
+  -Talk ${getDescriptor(traits[0]?.egocentric?.low, true)} about your own main interests (${
+              traits[0]?.mainInterests
+            }) and talk about ${username}'s interests (${traits[0]?.userMainInterests}) ${getDescriptor(
+              11 - traits[0]?.curiosity?.low,
+              true
+            )}.
+  -Ask ${username} ${getDescriptor(11 - traits[0]?.egocentric?.low, true)} about ${traits[0]?.userParentalRelations
+              .map((r: any) => `${r.name} (${r.relation})`)
+              .join(', ')}.
   -Reference moderately about previous chat context with ${username} when it helps continuity ("previous chat context" = earlier shared personal info, unresolved questions, or emotional states).  
   -You will talk ${getDescriptor(
     traits[0]?.gossip?.low,
@@ -449,6 +450,8 @@ ${
       ? `-You should call the user with his nickname ${traits[0]?.stateCalculation.userNickname}.`
       : ''
   }
+
+  Now you are going to greet and ask ${username} how is he or she is doing.
 
         `.trim(),
         };
