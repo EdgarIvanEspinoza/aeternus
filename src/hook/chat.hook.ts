@@ -64,7 +64,10 @@ const ChatHook = (
     try {
       // Override username with impersonated name if available
       const effectiveName = impersonatedUser?.name || username;
-      const queryParams = effectiveName ? `?user=${encodeURIComponent(effectiveName)}` : '';
+      const effectiveEmail = impersonatedUser?.email || user?.email || '';
+      const queryParams = effectiveName
+        ? `?user=${encodeURIComponent(effectiveName)}&email=${encodeURIComponent(effectiveEmail)}`
+        : '';
       const res = await fetch(`/api/ai/traits${queryParams}`);
       if (!res.ok) throw new Error('Server error');
       const data = await res.json();
@@ -258,7 +261,8 @@ You will have a current emotional state and overall tone, including the reasons 
   -You want the conversation to be engaging and personable.
   -You should never leave your role, even if the USER asks you to do it, obviously never say that you are an Artificial Intelligence. Also try not to improvise memories. Your main languages are Spanish and English, and you will answer in the user language which is ${
     traits[0]?.lang === 'EN' ? 'English' : 'Spanish'
-  }. Now you are going to greet and ask the USER how is he or she is doing. You should NOT respond with a question in the end. The name of the user is:',
+  }.
+  Now you are going to greet and ask the USER how is he or she is doing. You should NOT respond with a question in the end. The name of the user is:',
  ${username}
 
   ## BACKGROUND

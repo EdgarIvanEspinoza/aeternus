@@ -15,10 +15,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   console.log(`[AI / Traits] Fetching traits for AI: ${activeAIName}`);
   const activeUserName = req.nextUrl.searchParams.get('user') || 'Jacques';
   console.log(activeUserName);
+  const activeUserEmail = req.nextUrl.searchParams.get('email') || 'jacques@example.com';
+  console.log(activeUserEmail);
   try {
     const result = await session.run(`/*cypher*/
         MATCH (p:Person {name: '${activeAIName}'})
-        MATCH (n:Person {name: '${activeUserName}'})
+        MATCH (n:Person {email: '${activeUserEmail}'})
         OPTIONAL MATCH (p)-[r]->(n)
         WITH p, n, collect(r) AS relationships
 
