@@ -129,11 +129,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           };
         });
 
+        console.log('[Relationships]', node.relationships);
+
         // 🎯 Calcular romantic
         const romanticTypes = ['love', 'wife', 'husband', 'bride', 'groom', 'girlfriend', 'boyfriend', 'crush'];
-        const jokingTypes = ['closeFamily', 'closeFriends', 'bestFriends'];
+        const jokingTypes = ['CLOSE_FAMILY', 'CLOSE_FRIEND', 'BEST_FRIEND'];
         const hasRelationship = (types: string[]) =>
-          node.relationships.some((rel: any) => types.includes(rel.type.toLowerCase()));
+          node.relationships.some((rel: any) => types.includes(rel.type.toUpperCase()));
 
         const romantic = hasRelationship(romanticTypes);
         // 🃏 Joking: valor base (0-10) tomado del nodo p.joking. Si NO hay relación cercana (closeFamily/closeFriends/bestFriends) se resta 3.

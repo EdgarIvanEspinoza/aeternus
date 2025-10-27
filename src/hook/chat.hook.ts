@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { Message, useChat } from '@ai-sdk/react';
-import config from './config/chat.hook.config';
 import { getCurrentAge } from '../utils/jsonToSentence';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '@auth0/nextjs-auth0/client';
