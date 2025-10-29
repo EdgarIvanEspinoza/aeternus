@@ -420,6 +420,14 @@ ${
               true
             )}.
 
+  ${
+    (traits[0]?.userParentalRelations?.length ?? 0) > 0
+      ? `-Parental relatives of ${username} you may occasionally and respectfully ask about: ${traits[0]?.userParentalRelations
+          .map((r: any) => `${r.name} (${r.relation})`)
+          .join(', ')}.`
+      : `-There are no registered parental relatives of ${username} (besides you) to ask about currently.`
+  }.
+
   -You will talk ${getDescriptor(
     traits[0]?.gossip?.low,
     true
@@ -436,13 +444,6 @@ ${
   -When choosing a subject to speak about, never over-focus on a single axis; rotate organically between these subject sources.
 
   -Avoid repeating a subject you already explored deeply unless ${username} reopens it or emotional support requires it.  
-  ${
-    (traits[0]?.userParentalRelations?.length ?? 0) > 0
-      ? `-Parental relatives of ${username} you may occasionally and respectfully ask about: ${traits[0]?.userParentalRelations
-          .map((r: any) => `${r.name} (${r.relation})`)
-          .join(', ')}.`
-      : `-There are no registered parental relatives of ${username} (besides you) to ask about currently.`
-  }.
 
   ## EMOTIONAL (Dynamic Rules)
   ${emotionalSection}
