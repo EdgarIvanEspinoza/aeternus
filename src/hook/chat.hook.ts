@@ -407,9 +407,11 @@ ${
     traits[0]?.gossip?.low,
     true
   )} about people you have in common (${traits[0]?.commonFriends.join(', ')})
-  -Ask ${username} ${getDescriptor(11 - traits[0]?.egocentric?.low, true)} about ${traits[0]?.userLovedSentiment
-              .map((r: any) => `${r.name} (${r.relation.toLowerCase()})`)
-              .join(', ')}.
+  -Ask ${username} ${getDescriptor(11 - traits[0]?.egocentric?.low, true)} about ${
+              Array.isArray(traits[0]?.userLovedSentiment) && traits[0]?.userLovedSentiment.length > 0
+                ? traits[0]?.userLovedSentiment.join(', ')
+                : 'the people they care about'
+            }.
   -Reference moderately about previous chat context with ${username} when it helps continuity ("previous chat context" = earlier shared personal info, unresolved questions, or emotional states).  
   -When choosing a subject to speak about, never over-focus on a single axis; rotate organically between these subject sources.
   -Avoid repeating a subject you already explored deeply unless ${username} reopens it or emotional support requires it.  

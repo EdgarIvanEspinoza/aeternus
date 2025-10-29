@@ -70,7 +70,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       OPTIONAL MATCH (n)-[userLoveRel:LOVES]->(uc:Person)
       WHERE userLoveRel.name = 'Sentiment'
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
-          userParentalRelations, aiLovedSentiment, collect(DISTINCT uc.name) AS userLovedSentiment
+          userParentalRelations, collect(DISTINCT uc.name) AS userLovedSentiment
 
         RETURN {
             abilities: p.abilities,
@@ -116,6 +116,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userFriends: userFriends,
             userGender: n.gender,
             userIntelligence: n.intelligence,
+            userLovedSentiment: userLovedSentiment,
             userMainInterests: n.mainInterests,
             userParentalRelations: userParentalRelations,
             userFriendsHistory: n.friendsHistory,
@@ -123,7 +124,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userFamilyHistory: n.familyHistory,
             userHomeHistory: n.homeHistory,
             userEducationHistory: n.educationHistory,
-            words: p.words,
+            words: p.words
         } AS activeAIProfile
       `);
 
