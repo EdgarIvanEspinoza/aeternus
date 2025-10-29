@@ -45,12 +45,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         { name: fam.name, sentiment: CASE WHEN sentFam IS NULL THEN null ELSE type(sentFam) END }
       ) AS closeFamily
 
-      OPTIONAL MATCH (p)-[loveRel:LOVES]->(c)
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily,
-        collect(c.name) AS loves,
-        collect(CASE WHEN loveRel.name = 'Sentiment' THEN c.name ELSE NULL END) AS aiLovedSentimentRaw
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves,
-        [x IN aiLovedSentimentRaw WHERE x IS NOT NULL] AS aiLovedSentiment
+        OPTIONAL MATCH (p)-[:LOVES]->(c)
+        WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
 
       // --- UPDATED: Intersección de conexiones (amistad / familia cercana) comunes ---
       // Incluye relaciones: BEST_FRIEND, CLOSE_FRIEND, CLOSE_FAMILY, FRIEND presentes tanto en p como en n.
@@ -69,9 +65,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       OPTIONAL MATCH (n)-[prRel]->(relative:Person)
       WHERE prRel.name = 'Parental' AND relative.name <> p.name
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
-        collect(DISTINCT { name: relative.name, relation: type(prRel) }) AS userParentalRelations, aiLovedSentiment
-
-      // Loved Sentiment relations for user n
+        collect(DISTINCT { name: relative.name, relation: type(prRel) }) AS userParentalRelations
+         // Loved Sentiment relations for user n
       OPTIONAL MATCH (n)-[userLoveRel:LOVES]->(uc:Person)
       WHERE userLoveRel.name = 'Sentiment'
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
@@ -104,8 +99,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             lang: p.lang,
             location: p.location,
             loves: loves,
-            aiLovedSentiment: aiLovedSentiment,
-            userLovedSentiment: userLovedSentiment,
             mainInterests: p.mainInterests,
             minRepTime: p.minRepTime,
             profession: p.profession,
@@ -123,7 +116,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userFriends: userFriends,
             userGender: n.gender,
             userIntelligence: n.intelligence,
-            userLoves: n.userLovedSentiment,
             userMainInterests: n.mainInterests,
             userParentalRelations: userParentalRelations,
             userFriendsHistory: n.friendsHistory,
