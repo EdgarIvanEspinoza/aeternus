@@ -45,19 +45,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         { name: fam.name, sentiment: CASE WHEN sentFam IS NULL THEN null ELSE type(sentFam) END }
       ) AS closeFamily
 
-        OPTIONAL MATCH (p)-[:LOVES]->(c)
-        WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
+      OPTIONAL MATCH (p)-[loveRel:LOVES]->(c)
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily,
+        collect(c.name) AS loves,
+        collect(CASE WHEN loveRel.name = 'Sentiment' THEN c.name ELSE NULL END) AS aiLovedSentimentRaw
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves,
+        [x IN aiLovedSentimentRaw WHERE x IS NOT NULL] AS aiLovedSentiment
 
-      // --- NUEVO: Intersección de amistades del usuario y de la IA ---
-      OPTIONAL MATCH (p)-[aiRel]->(aiFriend:Person)
-      WHERE type(aiRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND']
-        AND NOT (p)-[:PARENTAL]->(aiFriend)
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(DISTINCT aiFriend.name) AS aiFriends
+      // --- UPDATED: Intersección de conexiones (amistad / familia cercana) comunes ---
+      // Incluye relaciones: BEST_FRIEND, CLOSE_FRIEND, CLOSE_FAMILY, FRIEND presentes tanto en p como en n.
+      OPTIONAL MATCH (p)-[pRel]->(pConn:Person)
+      WHERE type(pRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(DISTINCT pConn.name) AS aiFriends
 
-      OPTIONAL MATCH (n)-[userRel]->(userFriend:Person)
-      WHERE type(userRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND']
-        AND NOT (n)-[:PARENTAL]->(userFriend)
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, collect(DISTINCT userFriend.name) AS userFriends
+      OPTIONAL MATCH (n)-[nRel]->(nConn:Person)
+      WHERE type(nRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, collect(DISTINCT nConn.name) AS userFriends
 
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends,
         [x IN userFriends WHERE x IN aiFriends] AS commonFriends
@@ -66,16 +69,24 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       OPTIONAL MATCH (n)-[prRel]->(relative:Person)
       WHERE prRel.name = 'Parental' AND relative.name <> p.name
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
-        collect(DISTINCT { name: relative.name, relation: type(prRel) }) AS userParentalRelations
+        collect(DISTINCT { name: relative.name, relation: type(prRel) }) AS userParentalRelations, aiLovedSentiment
+
+      // Loved Sentiment relations for user n
+      OPTIONAL MATCH (n)-[userLoveRel:LOVES]->(uc:Person)
+      WHERE userLoveRel.name = 'Sentiment'
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, commonFriends,
+          userParentalRelations, aiLovedSentiment, collect(DISTINCT uc.name) AS userLovedSentiment
 
         RETURN {
             abilities: p.abilities,
+            aiFriends: aiFriends,
             animicState: p.animicState,
             animicStateSource: p.animicStateSource,
             bestFriends: bestFriends,
             chatty: p.chatty,
             closeFamily: closeFamily,
             closeFriends: closeFriends,
+            commonFriends: commonFriends,
             credibility: p.credibility,
             credulity: p.credulity,
             curiosity: p.curiosity,
@@ -88,33 +99,39 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             home: p.home,
             intelligence: p.intelligence,
             job: p.job,
+            jokeStyle: p.jokeStyle,
+            joking: p.joking,
+            lang: p.lang,
             location: p.location,
+            loves: loves,
+            aiLovedSentiment: aiLovedSentiment,
+            userLovedSentiment: userLovedSentiment,
             mainInterests: p.mainInterests,
             minRepTime: p.minRepTime,
             profession: p.profession,
             relationships: relationships,
             rolCharacter: p.rolCharacter,
-            lang: p.lang,
             rutine: p.rutine,
             specialCondition: p.specialCondition,
             traits: p.traits,
-            joking: p.joking,
-            jokeStyle: p.jokeStyle,
-            userDateOfBirth: n.dateOfBirth,
-            userDateOfDeath: n.dateOfDeath,
             userAnimicState: n.animicState,
             userAnimicStateSource: n.animicStateSource,
-            userMainInterests: n.mainInterests,
-            userIntelligence: n.intelligence,
-            userEmotionalIntelligence: n.emotionalIntelligence,
             userCredibility: n.credibility,
-            userGender: n.gender,
-            words: p.words,
-            loves: loves,
-            aiFriends: aiFriends,
+            userDateOfBirth: n.dateOfBirth,
+            userDateOfDeath: n.dateOfDeath,
+            userEmotionalIntelligence: n.emotionalIntelligence,
             userFriends: userFriends,
-            commonFriends: commonFriends,
-            userParentalRelations: userParentalRelations
+            userGender: n.gender,
+            userIntelligence: n.intelligence,
+            userLoves: n.userLovedSentiment,
+            userMainInterests: n.mainInterests,
+            userParentalRelations: userParentalRelations,
+            userFriendsHistory: n.friendsHistory,
+            userWorkHistory: n.workHistory,
+            userFamilyHistory: n.familyHistory,
+            userHomeHistory: n.homeHistory,
+            userEducationHistory: n.educationHistory,
+            words: p.words,
         } AS activeAIProfile
       `);
 
@@ -188,6 +205,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           DAUGHTER: 'Daughter',
           FATHER: 'Father',
           MOTHER: 'Mother',
+          HUSBAND: 'Husband',
+          WIFE: 'Wife',
+          BROTHER: 'Brother',
+          SISTER: 'Sister',
+          UNCLE: 'Uncle',
+          AUNT: 'Aunt',
+          COUSIN: 'Cousin',
+          GRANDPARENT: 'Grandparent',
+          GRANDCHILD: 'Grandchild',
         };
 
         // 🔎 Buscar relación parental
