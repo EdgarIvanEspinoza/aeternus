@@ -67,7 +67,7 @@ export const personNodeLookupTool: Tool = {
       console.log('[TOOL / Person Lookup GPT] Query time:', Date.now() - startQuery, 'ms');
 
       if (result.records.length === 0) {
-        return { text: `No person found for ${target}` };
+        return { text: "My memory is failing me because I can't recall what you mentioned." };
       }
 
       // Extract person node (first record's p) and relationships
@@ -132,7 +132,7 @@ export const personNodeLookupTool: Tool = {
       };
     } catch (err) {
       console.error('[TOOL / Person Lookup GPT] Error:', err);
-      return { text: `Error fetching person data for ${query}` };
+      return { text: "My memory is failing me, I can't remember that information right now." };
     } finally {
       if (session) await session.close();
     }
