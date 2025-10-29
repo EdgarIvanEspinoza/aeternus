@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     },
     maxSteps: 3,
     maxTokens: 4096, // Maximo de tokens a devolver
-    temperature: 0.8, // Entre 0 y 1, entre mas alto mas creativo
+    temperature: 0.5, // Entre 0 y 1, entre mas alto mas creativo
     topP: 1, // Entre 0 y 1, entre mas alto mas creativo
     frequencyPenalty: 1, // Entre -2 y 2, entre mas alto menos repetitivo
     presencePenalty: 1, // Entre -2 y 2, entre mas alto menos repetitivo
