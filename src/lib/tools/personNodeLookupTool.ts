@@ -53,7 +53,9 @@ export const personNodeLookupTool: Tool = {
         steps: [cypherStep],
       } = await generateText({ model: openai.responses('gpt-4o'), prompt: cypherPrompt, temperature: 0.1 });
       let generatedCypher = cypherStep.text.trim();
-      console.log('[TOOL / Person Lookup GPT] Generated Cypher:', generatedCypher);
+      // Remove code block delimiters and extra whitespace
+      generatedCypher = generatedCypher.replace(/```/g, '').trim();
+      console.log('[TOOL / Person Lookup GPT] Sanitized Cypher:', generatedCypher);
 
       // Basic validation; fallback if missing expected RETURN
       if (!/RETURN\s+\w+/i.test(generatedCypher)) {
