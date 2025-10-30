@@ -25,17 +25,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         WITH p, n, collect(r) AS relationships
 
     // Best friends + posible Sentiment rel (sentBF)
-      OPTIONAL MATCH (p)-[:BEST_FRIEND]->(bf)
+      OPTIONAL MATCH (p)-[bfRel:BEST_FRIEND]->(bf)
       OPTIONAL MATCH (p)-[sentBF]->(bf) WHERE sentBF.name = "Sentiment"
       WITH p, n, relationships, collect(
-        { name: bf.name, sentiment: CASE WHEN sentBF IS NULL THEN null ELSE type(sentBF) END }
+        { name: bf.name, relationType: type(bfRel), sentiment: CASE WHEN sentBF IS NULL THEN null ELSE type(sentBF) END }
       ) AS bestFriends
 
       // Close friends + posible Sentiment rel (sentCF)
-      OPTIONAL MATCH (p)-[:CLOSE_FRIEND]->(cf)
+      OPTIONAL MATCH (p)-[cfRel:CLOSE_FRIEND]->(cf)
       OPTIONAL MATCH (p)-[sentCF]->(cf) WHERE sentCF.name = "Sentiment"
       WITH p, n, relationships, bestFriends, collect(
-        { name: cf.name, sentiment: CASE WHEN sentCF IS NULL THEN null ELSE type(sentCF) END }
+        { name: cf.name, relationType: type(cfRel), sentiment: CASE WHEN sentCF IS NULL THEN null ELSE type(sentCF) END }
       ) AS closeFriends
 
       // Close family: collect CLOSE_FAMILY nodes and any Parental/Sentiment rels into one object per person
@@ -57,16 +57,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
       // --- UPDATED: Intersección de conexiones (amistad / familia cercana) comunes ---
       // Incluye relaciones: BEST_FRIEND, CLOSE_FRIEND, CLOSE_FAMILY, FRIEND presentes tanto en p como en n.
-      OPTIONAL MATCH (p)-[pRel]->(pConn:Person)
-      WHERE type(pRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(DISTINCT pConn.name) AS aiFriends
+  OPTIONAL MATCH (p)-[pRel]->(pConn:Person)
+  WHERE type(pRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
+  WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, collect(DISTINCT { name: pConn.name, relationType: type(pRel) }) AS aiFriends
 
-      OPTIONAL MATCH (n)-[nRel]->(nConn:Person)
-      WHERE type(nRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
-      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, collect(DISTINCT nConn.name) AS userFriends
+  OPTIONAL MATCH (n)-[nRel]->(nConn:Person)
+  WHERE type(nRel) IN ['BEST_FRIEND', 'CLOSE_FRIEND', 'CLOSE_FAMILY', 'FRIEND']
+  OPTIONAL MATCH (n)-[sentN]->(nConn) WHERE sentN.name = 'Sentiment'
+  WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, collect(DISTINCT { name: nConn.name, relationType: type(nRel), sentiment: CASE WHEN sentN IS NULL THEN null ELSE type(sentN) END }) AS userFriends
 
       WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends,
-        [x IN userFriends WHERE x IN aiFriends AND x <> p.name] AS commonFriends
+        [f IN aiFriends | f.name] AS aiFriendNames,
+        [f IN userFriends | f.name] AS userFriendNames
+
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, loves, aiFriends, userFriends, aiFriendNames, userFriendNames,
+        [x IN userFriendNames WHERE x IN aiFriendNames AND x <> p.name] AS commonFriends
 
       // Parental relations of the user (excluding the active AI)
       OPTIONAL MATCH (n)-[prRel]->(relative:Person)
@@ -123,6 +128,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             userEmotionalIntelligence: n.emotionalIntelligence,
             userFamilyHistory: n.familyHistory,
             userFriends: userFriends,
+            userFriendsNames: [x IN userFriends | x.name],
+            aiFriendsNames: [x IN aiFriends | x.name],
             userFriendsHistory: n.friendsHistory,
             userGender: n.gender,
             userHome: n.home,

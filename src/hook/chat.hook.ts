@@ -140,9 +140,50 @@ const ChatHook = (
   //TODO:  Armar la build Emotional solo del Usuario
   function buildEmotionalSection(traits: any[], username: string | null | undefined) {
     const ai = traits[0] ?? {};
-    // const aiFriends: string[] = Array.isArray(ai.aiFriends) ? ai.aiFriends : [];
-    const userFriends: string[] = Array.isArray(ai.userFriends) ? ai.userFriends : [];
+    // Normalize commonFriends to an array of names in case the API returned objects
+    if (Array.isArray(ai.commonFriends)) {
+      ai.commonFriends = ai.commonFriends.map((c: any) => (typeof c === 'string' ? c : c?.name || '')).filter(Boolean);
+    }
+    // Use only user-scoped arrays; do NOT fallback to ai.* fields
+    const userBestFriends: any[] = Array.isArray(ai.userBestFriends) ? ai.userBestFriends : [];
+    const userCloseFriends: any[] = Array.isArray(ai.userCloseFriends) ? ai.userCloseFriends : [];
+    const userCloseFamily: any[] = Array.isArray(ai.userCloseFamily) ? ai.userCloseFamily : [];
+    const rawUserFriends: any[] = Array.isArray(ai.userFriends) ? ai.userFriends : [];
     const commonFriends: string[] = Array.isArray(ai.commonFriends) ? ai.commonFriends : [];
+
+    // If explicit userBestFriends / userCloseFriends are empty, derive them from rawUserFriends objects
+    const derivedBest = rawUserFriends.filter((f) => f && (f.relationType || '').toUpperCase() === 'BEST_FRIEND');
+    const derivedClose = rawUserFriends.filter((f) => f && (f.relationType || '').toUpperCase() === 'CLOSE_FRIEND');
+    const derivedCloseFamily = rawUserFriends.filter(
+      (f) => f && (f.relationType || '').toUpperCase() === 'CLOSE_FAMILY'
+    );
+
+    // Build a lookup for closeFamily metadata (parentalType/sentiment) by name if available
+    const closeFamilyMap: Record<string, any> = {};
+    if (Array.isArray(ai.closeFamily)) {
+      ai.closeFamily.forEach((cf: any) => {
+        if (cf && cf.name) closeFamilyMap[String(cf.name)] = cf;
+      });
+    }
+
+    // Only use user-side data to determine sentiment. Use sentiment from rawUserFriends entries or closeFamily metadata.
+    const effectiveUserBestFriends =
+      userBestFriends.length > 0
+        ? userBestFriends
+        : derivedBest.map((d) => ({ name: d.name, sentiment: d.sentiment || null }));
+
+    const effectiveUserCloseFriends =
+      userCloseFriends.length > 0
+        ? userCloseFriends
+        : derivedClose.map((d) => ({ name: d.name, sentiment: d.sentiment || null }));
+
+    const effectiveUserCloseFamily =
+      userCloseFamily.length > 0
+        ? userCloseFamily
+        : derivedCloseFamily.map((d) => {
+            const meta = closeFamilyMap[d.name] || {};
+            return { name: d.name, parentalType: meta.parentalType || null, sentiment: meta.sentiment || null };
+          });
     const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
       ? ai.userParentalRelations
       : [];
@@ -171,12 +212,25 @@ const ChatHook = (
         .join(', ')}.`;
     };
 
+    // Build the EMOTIONAL section specifically for the User (best/close friends & close family with sentiment)
+    const formatSentimentList = (list: any[], categoryLabel: string, includeParental = false) => {
+      const named = list.filter((f) => f && f.name);
+      if (named.length === 0) return `-${username} has no ${categoryLabel}.`;
+      const items = named.map((f: any) => {
+        const displayName = includeParental && f.parentalType ? `${f.name} (${f.parentalType})` : f.name;
+        return f.sentiment ? `${displayName} ${getSentimentTowardSentence(f.sentiment)}` : displayName;
+      });
+      return `-The following are ${username}'s ${categoryLabel} and ${username}'s feelings towards each one: ${items.join(
+        ', '
+      )}.`;
+    };
+
     const sections: string[] = [
-      // formatRelations(ai.bestFriends || [], 'best friends'),
-      // formatRelations(ai.closeFriends || [], 'close friends'),
-      // formatRelations(ai.closeFamily || [], 'closest family'),
-      // formatPlainList(aiFriends, 'friends'),
-      formatPlainList(userFriends, `${username} friends`),
+      // User-focused emotional lists
+      formatSentimentList(effectiveUserBestFriends, 'best friends'),
+      formatSentimentList(effectiveUserCloseFriends, 'close friends'),
+      formatSentimentList(effectiveUserCloseFamily, 'closest family', true),
+      // Additional context still useful
       formatPlainList(commonFriends, 'common friends'),
       formatParentalList(),
       `-You feel ${ai.animicState} because ${ai.animicStateSource}.`,
@@ -458,6 +512,11 @@ ${
     traits[0]?.gossip?.low,
     true
   )} about people you have in common (${traits[0]?.commonFriends.join(', ')})
+  -You will talk ${getDescriptor(traits[0]?.gossip?.low, true)} about people you have in common (${
+              Array.isArray(traits[0]?.commonFriends) && traits[0]?.commonFriends.length > 0
+                ? traits[0]?.commonFriends.join(', ')
+                : 'none'
+            })
 
   -Ask ${username} ${getDescriptor(11 - traits[0]?.egocentric?.low, true)} about ${
               Array.isArray(traits[0]?.userLovedSentiment) && traits[0]?.userLovedSentiment.length > 0
