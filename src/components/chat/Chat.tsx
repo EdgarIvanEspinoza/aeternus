@@ -173,7 +173,7 @@ export const Chat = ({
           </div>
         ) : (
           <div ref={scrollContainerRef} className="w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700/50 pt-16" data-chat-scroll-container>
-            <div className="mx-auto w-[80%] pt-6 pb-40 flex flex-col">
+            <div className="mx-auto w-full max-w-[1200px] px-6 pt-6 pb-40 flex flex-col">
               {messages
                 .filter((msg) => (adminMode ? true : msg.role !== 'system'))
                 .map((message) => (
@@ -192,7 +192,7 @@ export const Chat = ({
         {/* Input spacer to avoid last message hidden behind fixed bar */}
         <div className="pointer-events-none h-0" />
         <div className="fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/80 to-black/0 backdrop-blur-sm border-t border-zinc-800/60">
-          <div className="mx-auto w-[80%] py-4">
+          <div className="mx-auto w-full max-w-[1200px] py-4">
             <ChatInputComponent disabled={loading} scrollToBottom={scrollToBottom} {...{ handleSubmit, input, handleInputChange }} />
           </div>
         </div>

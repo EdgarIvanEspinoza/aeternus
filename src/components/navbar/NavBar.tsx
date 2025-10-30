@@ -100,13 +100,13 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           </Button>
         )}
         
-        {/* Botón de Feedback */}
+        {/* Botón de Feedback - always visible */}
         <Button
           isIconOnly
           color="primary"
           variant="flat"
           aria-label="Enviar feedback"
-          className="mr-2 hidden sm:inline-flex"
+          className="mr-2"
           onPress={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))}
         >
           <MessageSquarePlus size={20} />
@@ -177,11 +177,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 )}
               </DropdownItem>
 
-              <DropdownItem key="mobile_feedback">
-                <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))} className="text-left w-full">
-                  Enviar feedback
-                </button>
-              </DropdownItem>
+              {/* feedback is available outside the menu on all sizes */}
             </DropdownSection>
             {checkUserIsAdmin(user?.email || '') ? (
               <DropdownSection aria-label="Admin Mode" showDivider>
