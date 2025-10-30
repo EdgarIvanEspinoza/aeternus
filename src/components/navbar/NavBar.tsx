@@ -64,7 +64,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
             color="secondary"
             variant="flat"
             aria-label="Ir al chat"
-            className="mr-2"
+            className="mr-2 hidden sm:inline-flex"
             as={NextLink}
             href="/chat"
             startContent={<MessageCircle size={18} />}
@@ -79,7 +79,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
             color="secondary"
             variant="flat"
             aria-label="Admin Dashboard"
-            className="mr-2"
+            className="mr-2 hidden sm:inline-flex"
             as={NextLink}
             href="/admin"
             startContent={<LayoutDashboard size={18} />}
@@ -93,7 +93,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
             color="secondary"
             variant={impersonatedUser ? 'solid' : 'flat'}
             aria-label="Impersonar usuario"
-            className="mr-2"
+            className="mr-2 hidden sm:inline-flex"
             onPress={() => setImpersonationOpen(true)}
           >
             {impersonatedUser ? 'Impersonando…' : 'Impersonar'}
@@ -106,7 +106,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           color="primary"
           variant="flat"
           aria-label="Enviar feedback"
-          className="mr-2"
+          className="mr-2 hidden sm:inline-flex"
           onPress={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))}
         >
           <MessageSquarePlus size={20} />
@@ -142,6 +142,45 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
               <DropdownItem key="profile" isReadOnly className="h-14 gap-2 opacity-100">
                 <p className="font-semibold text-white-100">{user?.name}</p>
                 <p className="text-xs">{user?.email}</p>
+              </DropdownItem>
+            </DropdownSection>
+            {/* Mobile-only quick actions: show these inside the dropdown only on small screens */}
+            <DropdownSection aria-label="Mobile Actions" className="sm:hidden">
+              <DropdownItem key="mobile_chat" className={!isChat ? undefined : undefined}>
+                {/* Only show on mobile and when not in chat; wrapper section already hidden on sm+ */}
+                {!isChat ? (
+                  <NextLink href="/chat" className="text-current">
+                    Ir al Chat
+                  </NextLink>
+                ) : (
+                  <span className="sr-only" />
+                )}
+              </DropdownItem>
+
+              <DropdownItem key="mobile_dashboard">
+                {isChat && checkUserIsAdmin(user?.email || '') ? (
+                  <NextLink href="/admin" className="text-current">
+                    Admin Dashboard
+                  </NextLink>
+                ) : (
+                  <span className="sr-only" />
+                )}
+              </DropdownItem>
+
+              <DropdownItem key="mobile_impersonate">
+                {isChat && checkUserIsAdmin(user?.email || '') ? (
+                  <button type="button" onClick={() => setImpersonationOpen(true)} className="text-left w-full">
+                    {impersonatedUser ? `Impersonando: ${impersonatedUser.name}` : 'Impersonar usuario'}
+                  </button>
+                ) : (
+                  <span className="sr-only" />
+                )}
+              </DropdownItem>
+
+              <DropdownItem key="mobile_feedback">
+                <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))} className="text-left w-full">
+                  Enviar feedback
+                </button>
               </DropdownItem>
             </DropdownSection>
             {checkUserIsAdmin(user?.email || '') ? (

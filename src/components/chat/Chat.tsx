@@ -165,7 +165,6 @@ export const Chat = ({
             Impersonando: {impersonatedUser.name || impersonatedUser.email}
           </div>
         )}
-        <ConversationDebugBadge />
         {loading ? (
           <div className="flex items-center justify-center flex-1 h-full w-full">
             <div className="loader">
