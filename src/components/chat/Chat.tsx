@@ -134,37 +134,58 @@ export const Chat = ({
     if (!spacer) return;
 
     const vv = typeof window !== 'undefined' && 'visualViewport' in window ? (window as unknown as { visualViewport: VisualViewport }).visualViewport : undefined;
-    if (!vv) {
-      // No visualViewport support: keep spacer at 0
-      spacer.style.height = '0px';
-      return;
-    }
+
+    // Keep last known window.innerHeight to compute deltas for browsers that don't expose visualViewport properly
+    let lastInnerHeight = window.innerHeight;
 
     const update = () => {
       try {
-        // compute keyboard height as the difference between layout viewport and visual viewport
-        const keyboardHeight = Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0));
         // account for safe area inset bottom as well
         const safeInset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom') || '0', 10) || 0;
-        const desired = Math.round(Math.max(0, keyboardHeight - safeInset));
+
+        // Heuristic 1: visualViewport (best on modern browsers)
+        let keyboardHeight = 0;
+        if (vv) {
+          keyboardHeight = Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0));
+        }
+
+        // Heuristic 2: innerHeight delta (helpful in Chrome when visualViewport is unreliable)
+        const innerDelta = Math.max(0, lastInnerHeight - window.innerHeight);
+        if (innerDelta > keyboardHeight) keyboardHeight = innerDelta;
+
+        // Heuristic 3: documentElement clientHeight difference
+        const docClient = document.documentElement.clientHeight || 0;
+        const clientDelta = Math.max(0, window.innerHeight - docClient);
+        if (clientDelta > keyboardHeight) keyboardHeight = clientDelta;
+
+        // small buffer to avoid being covered by floating bars
+        const buffer = 8;
+        const desired = Math.round(Math.max(0, keyboardHeight - safeInset + buffer));
         spacer.style.height = `${desired}px`;
         // ensure messages and input are visible after viewport change
         scrollToBottom(true);
+
+        // update lastInnerHeight for next run
+        lastInnerHeight = window.innerHeight;
       } catch {
         spacer.style.height = '0px';
       }
     };
 
     update();
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
+    if (vv) {
+      vv.addEventListener('resize', update);
+      vv.addEventListener('scroll', update);
+    }
 
     // Also listen to window resize as an extra fallback
     window.addEventListener('resize', update);
 
     return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
+      if (vv) {
+        vv.removeEventListener('resize', update);
+        vv.removeEventListener('scroll', update);
+      }
       window.removeEventListener('resize', update);
       spacer.style.height = '0px';
     };
