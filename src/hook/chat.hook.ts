@@ -381,9 +381,10 @@ ${
   traits[0]?.closeFamily.filter((f: any) => f?.name).length > 0
     ? `-The following are your closest family and your feelings towards each one: ${traits[0]?.closeFamily
         .filter((f: any) => f?.name)
-        .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
-        )
+        .map((f: { name: string; sentiment: string | null; parentalType?: string }) => {
+          const displayName = f.parentalType ? `${f.name} (${f.parentalType})` : f.name;
+          return f.sentiment ? `${displayName} ${getSentimentTowardSentence(f.sentiment)}` : displayName;
+        })
         .join(', ')}.`
     : '-You have no close family.'
 }

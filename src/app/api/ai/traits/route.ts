@@ -38,15 +38,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         { name: cf.name, sentiment: CASE WHEN sentCF IS NULL THEN null ELSE type(sentCF) END }
       ) AS closeFriends
 
-      // Close family + posible Sentiment rel (sentFam)
-      OPTIONAL MATCH (p)-[:CLOSE_FAMILY]->(fam)
-      OPTIONAL MATCH (p)-[sentFam]->(fam) WHERE sentFam.name = "Sentiment"
+      // Close family: collect CLOSE_FAMILY nodes and any Parental/Sentiment rels into one object per person
+      OPTIONAL MATCH (p)-[famRel]->(fam)
+      WHERE type(famRel) = 'CLOSE_FAMILY' OR famRel.name IN ['Parental', 'Sentiment']
+      WITH p, n, relationships, bestFriends, closeFriends, fam, famRel
+      // gather all relation instances for the same fam node
+      WITH p, n, relationships, bestFriends, closeFriends, fam, collect({ relType: type(famRel), relName: famRel.name }) AS famRels
       WITH p, n, relationships, bestFriends, closeFriends, collect(
-        { name: fam.name, sentiment: CASE WHEN sentFam IS NULL THEN null ELSE type(sentFam) END }
+        {
+          name: fam.name,
+          relations: famRels,
+          sentiment: head([x IN famRels WHERE x.relName = 'Sentiment' | x.relType]),
+          parentalType: head([x IN famRels WHERE x.relName = 'Parental' | x.relType])
+        }
       ) AS closeFamily
-
-        OPTIONAL MATCH (p)-[:LOVES]->(c)
-        WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
+      OPTIONAL MATCH (p)-[:LOVES]->(c)
+      WITH p, n, relationships, bestFriends, closeFriends, closeFamily, collect(c.name) AS loves
 
       // --- UPDATED: Intersección de conexiones (amistad / familia cercana) comunes ---
       // Incluye relaciones: BEST_FRIEND, CLOSE_FRIEND, CLOSE_FAMILY, FRIEND presentes tanto en p como en n.
@@ -141,7 +148,31 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           };
         });
 
-        console.log('[Relationships]', node.relationships);
+        // Normalize closeFamily: if relations is an array, convert to a comma-separated string
+        if (Array.isArray(node.closeFamily)) {
+          node.closeFamily = node.closeFamily.map((cf: any) => {
+            const rels = Array.isArray(cf.relations)
+              ? cf.relations
+                  .map((r: any) => {
+                    // r has shape { relType, relName }
+                    if (!r) return null;
+                    const typePart = r.relType || r.relType === 0 ? String(r.relType) : '';
+                    const namePart = r.relName ? String(r.relName) : '';
+                    return namePart ? `${typePart}:${namePart}` : `${typePart}`;
+                  })
+                  .filter(Boolean)
+                  .join(', ')
+              : '';
+            return {
+              name: cf.name,
+              relations: rels,
+              sentiment: cf.sentiment || null,
+              parentalType: cf.parentalType || null,
+            };
+          });
+        }
+
+        console.log('[Relationships]', node.relationships, 'closeFamily:', node.closeFamily);
 
         // 🎯 Calcular romantic
         const romanticTypes = ['love', 'wife', 'husband', 'bride', 'groom', 'girlfriend', 'boyfriend', 'crush'];

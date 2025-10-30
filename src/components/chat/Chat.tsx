@@ -6,7 +6,6 @@ import { ChatMessage } from './ChatMessage/ChatMessage';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { getNameAndFamilyFromUser, getNameFromUser } from '@utils/main.utils';
 import { AlphaInfoModal } from '@components/modal/AlphaInfoModal';
-import { ConversationDebugBadge } from './ConversationDebugBadge';
 
 export const Chat = ({
   jacquesMode,
@@ -149,6 +148,8 @@ export const Chat = ({
         const safeInset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom') || '0', 10) || 0;
         const desired = Math.round(Math.max(0, keyboardHeight - safeInset));
         spacer.style.height = `${desired}px`;
+        // ensure messages and input are visible after viewport change
+        scrollToBottom(true);
       } catch {
         spacer.style.height = '0px';
       }
@@ -167,7 +168,7 @@ export const Chat = ({
       window.removeEventListener('resize', update);
       spacer.style.height = '0px';
     };
-  }, []);
+  }, [scrollToBottom]);
 
   // React to messages array changes - SIEMPRE scroll tras nuevos mensajes con repetición
   useEffect(() => {
