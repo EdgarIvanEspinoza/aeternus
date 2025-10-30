@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai';
-import { graphRelationshipAnalyzerTool } from '@lib/tools/graphRelationshipAnalyzerTools';
+// import { graphRelationshipAnalyzerTool } from '@lib/tools/graphRelationshipAnalyzerTools';
 import { personNodeLookupTool } from '@lib/tools/personNodeLookupTool';
 import { streamText } from 'ai';
 // import { cypherBuilderTool } from '@lib/tools/cypher-builder';
@@ -13,10 +13,10 @@ export async function POST(req: Request) {
     tools: {
       web_search_preview: openai.tools.webSearchPreview(),
       // cypher_builder: cypherBuilderTool,
-      graphRelationshipAnalyzerTool: graphRelationshipAnalyzerTool,
+      // graphRelationshipAnalyzerTool: graphRelationshipAnalyzerTool,
       personNodeLookup: personNodeLookupTool,
     },
-    maxSteps: 3,
+    maxSteps: 8,
     maxTokens: 4096, // Maximo de tokens a devolver
     temperature: 0.5, // Entre 0 y 1, entre mas alto mas creativo
     topP: 1, // Entre 0 y 1, entre mas alto mas creativo

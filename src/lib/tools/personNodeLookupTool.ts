@@ -33,7 +33,7 @@ const normalizePerson = (raw: string): string => {
 
 export const personNodeLookupTool: Tool = {
   description:
-    'Fetch full profile of a single person (properties + direct relationships). Use for queries like "quién es X", "who is X", "tell me about X". Avoid calling for trivial greetings or repeated lookups without new context.',
+    'Fetch full profile of a single person (properties + direct relationships). Use it everytime a Person is mentioned in the conversation. Avoid calling for trivial greetings or repeated lookups without new context.',
   parameters: z.object({
     query: z.string().describe('Name or email of the person to inspect'),
   }),
@@ -105,20 +105,18 @@ export const personNodeLookupTool: Tool = {
 
       const relBreakdown: Record<string, number> = {};
       for (const rel of relationships) relBreakdown[rel.type] = (relBreakdown[rel.type] || 0) + 1;
-      const topTypes = Object.entries(relBreakdown)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
-        .map(([t, c]) => `${t}(${c})`)
-        .join(', ');
 
-      const summary = `Perfil de '${personNode?.properties?.name || target}': ${
+      const relationsList = relationships.map((r) => `${r.otherName}(${r.type ?? 'unknown'})`).join(', ');
+
+      const summary = `Profile of '${personNode?.properties?.name || target}': ${
         relationships.length
-      } relaciones directas. Principales tipos: ${
-        topTypes || 'ninguno'
-      }. Usa estos datos para responder de forma contextual y humana.`;
+      } direct relations. Relations: ${
+        relationsList || 'none'
+      }. Use this information to respond accordingly to the user information needs.`;
 
       const totalMs = Date.now() - startTotal;
       console.log('[TOOL / Person Lookup GPT] COMPLETE in', totalMs, 'ms');
+      console.log('[TOOL / Person Lookup GPT] Summary:', summary || 'Unknown');
       return {
         text: summary,
         person: {
@@ -126,6 +124,7 @@ export const personNodeLookupTool: Tool = {
           email: personNode?.properties?.email,
           properties: personNode?.properties || {},
           relationships,
+          relationsString: relationsList,
         },
         signal: 'DATA_READY_PERSON',
         timings: { totalMs },
