@@ -1,14 +1,9 @@
 import { z } from 'zod';
-import { generateText, Tool } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { Tool } from 'ai';
 import driver from '../neo4j/driver';
 
-// Single Person Node Lookup Tool
-// 1. Generates (via GPT) a Cypher query to fetch the Person node plus its direct relationships to any node.
-// 2. Executes a safe fallback query if the generated one is malformed.
-// 3. Fetches enriched relationship data (direction, type, connected node label + key properties).
-// 4. Summarizes the person context (properties + relationship distribution).
-// NOTE: Self references (assistant) are normalized to 'Lequi'.
+// Deterministic JS-only person lookup tool. Avoids calling LLMs so it can be
+// invoked repeatedly without causing nested LLM execution or crashes.
 
 const SELF_ALIASES = [
   'lequi',
@@ -33,105 +28,116 @@ const normalizePerson = (raw: string): string => {
 
 export const personNodeLookupTool: Tool = {
   description:
-    'Fetch full profile of a single person (properties + direct relationships). Use it everytime a Person is mentioned in the conversation. Avoid calling for trivial greetings or repeated lookups without new context.',
-  parameters: z.object({
-    query: z.string().describe('Name or email of the person to inspect'),
-  }),
+    'Fetch full profile of a single person (properties + direct relationships). Deterministic and safe for repeated calls.',
+  parameters: z.object({ query: z.string().describe('Name or email of the person to inspect') }),
   async execute({ query }) {
     const startTotal = Date.now();
-    let session;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let session: any = null;
     const target = normalizePerson(query);
-    console.log(`[TOOL / Person Lookup GPT] START target='${target}' raw='${query}'`);
-    if (target === 'Lequi') {
-      return { text: 'Skipped self lookup (assistant = Lequi).', person: null };
-    }
+    console.log(`[TOOL / PersonLookup] START target='${target}' raw='${query}'`);
+
+    if (target === 'Lequi') return { text: 'Skipped self lookup (assistant = Lequi).', person: null };
+
     try {
-      // 1. Ask GPT for a Cypher tailored to the person (may include flexible patterns)
-      const cypherPrompt = `You are generating a Neo4j Cypher query to retrieve one Person node and its direct relationships.\nPerson of interest: "${target}".\nRequirements:\n- Try to match either by exact name OR (if not found) by case-insensitive name (use toLower).\n- Return the person node as p and each relationship plus the connected node.\n- Limit to a reasonable number (<= 200 relationships) to avoid overload.\nReturn ONLY the Cypher, no markdown, no commentary.\nExample pattern to inspire (do not just copy blindly):\nMATCH (p:Person {name: $name}) OPTIONAL MATCH (p)-[r]-(o) RETURN p, r, o LIMIT 200`;
-
-      const {
-        steps: [cypherStep],
-      } = await generateText({ model: openai.responses('gpt-4o'), prompt: cypherPrompt, temperature: 0.1 });
-      let generatedCypher = cypherStep.text.trim();
-      // Remove code block delimiters and extra whitespace
-      generatedCypher = generatedCypher.replace(/```/g, '').trim();
-      console.log('[TOOL / Person Lookup GPT] Sanitized Cypher:', generatedCypher);
-
-      // Basic validation; fallback if missing expected RETURN
-      if (!/RETURN\s+\w+/i.test(generatedCypher)) {
-        generatedCypher = 'MATCH (p:Person {name: $name}) OPTIONAL MATCH (p)-[r]-(o) RETURN p, r, o LIMIT 200';
-      }
       session = driver.session();
-      const startQuery = Date.now();
-      const result = await session.run(generatedCypher, { name: target });
-      console.log('[TOOL / Person Lookup GPT] Query time:', Date.now() - startQuery, 'ms');
 
-      if (result.records.length === 0) {
-        return { text: "My memory is failing me because I can't recall what you mentioned." };
-      }
+      const cypher = `/*cypher*/
+        MATCH (p:Person {name: $name})
+        OPTIONAL MATCH (p)-[r]-(o)
+        RETURN p, collect(r) AS rels, collect(o) AS others LIMIT 1
+      `;
 
-      // Extract person node (first record's p) and relationships
-      interface GraphNodeLike {
-        identity?: { toString(): string };
-        properties?: Record<string, unknown>;
-        labels?: string[];
-      }
-      let personNode: GraphNodeLike | null = null;
-      const relationships: Array<{
+      const res = await session.run(cypher, { name: target });
+      if (!res || res.records.length === 0) return { text: `No data found for ${target}`, person: null };
+
+      const rec = res.records[0];
+      const p = rec.get('p');
+      const rels = Array.isArray(rec.get('rels')) ? rec.get('rels') : [];
+      const others = Array.isArray(rec.get('others')) ? rec.get('others') : [];
+
+      // Build raw relationship instances first
+      const rawRels: Array<{
         type: string;
         direction: 'OUT' | 'IN';
-        otherLabel: string;
         otherName?: string;
-        otherEmail?: string;
-        properties: Record<string, unknown>;
       }> = [];
 
-      for (const record of result.records) {
-        if (!personNode) personNode = record.get('p') as GraphNodeLike;
-        const r = record.get('r');
-        const o = record.get('o');
-        if (r && o) {
-          relationships.push({
-            type: r.type,
-            direction:
-              personNode?.identity && r.start?.identity?.toString() === personNode.identity.toString() ? 'OUT' : 'IN',
-            otherLabel: Array.isArray(o.labels) ? o.labels[0] : 'Unknown',
-            otherName: o.properties?.name,
-            otherEmail: o.properties?.email,
-            properties: r.properties || {},
-          });
-        }
+      for (let i = 0; i < rels.length; i++) {
+        const r = rels[i];
+        const o = others[i];
+        if (!r || !o) continue;
+        const otherName = o.properties?.name;
+        const direction =
+          r.start && p && r.start.identity && p.identity && r.start.identity.toString() === p.identity.toString()
+            ? 'OUT'
+            : 'IN';
+        rawRels.push({ type: r.type || 'UNKNOWN', direction, otherName });
       }
 
+      // Group by other node name. Skip relations without a name.
+      const grouped = new Map<
+        string,
+        Array<{
+          type: string;
+          direction: 'OUT' | 'IN';
+        }>
+      >();
+
+      for (const rr of rawRels) {
+        if (!rr.otherName) continue; // skip unnamed nodes
+        const list = grouped.get(rr.otherName) || [];
+        list.push({ type: rr.type, direction: rr.direction });
+        grouped.set(rr.otherName, list);
+      }
+
+      // Convert grouped map into the unified relationships shape the user requested:
+      // [{ name: string, relations: [{type,direction}, ...] }, ...]
+      const relationships = Array.from(grouped.entries()).map(([name, rels]) => ({
+        name,
+        relations: rels,
+      }));
+
+      // Breakdown by type across all relations (for the summary)
       const relBreakdown: Record<string, number> = {};
-      for (const rel of relationships) relBreakdown[rel.type] = (relBreakdown[rel.type] || 0) + 1;
+      for (const relList of relationships) {
+        for (const r of relList.relations) relBreakdown[r.type] = (relBreakdown[r.type] || 0) + 1;
+      }
 
-      const relationsList = relationships.map((r) => `${r.otherName}(${r.type ?? 'unknown'})`).join(', ');
+      const topTypes = Object.entries(relBreakdown)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([t, c]) => `${t}(${c})`)
+        .join(', ');
 
-      const summary = `Profile of '${personNode?.properties?.name || target}': ${
+      // relationsString: 'Name: TYPE(OUT), TYPE2(IN); Other: ...'
+      const relationsList = relationships
+        .map((r) => `${r.name}: ${r.relations.map((x) => `${x.type}(${x.direction})`).join(', ')}`)
+        .join('; ');
+
+      const summary = `Profile of '${p?.properties?.name ?? target}': ${
         relationships.length
-      } direct relations. Relations: ${
-        relationsList || 'none'
-      }. Use this information to respond accordingly to the user information needs.`;
+      } direct relations. Main types: ${topTypes || 'none'}. Relations: ${relationsList || 'none'}.`;
 
       const totalMs = Date.now() - startTotal;
-      console.log('[TOOL / Person Lookup GPT] COMPLETE in', totalMs, 'ms');
-      console.log('[TOOL / Person Lookup GPT] Summary:', summary || 'Unknown');
-      return {
+      console.log('[TOOL / PersonLookup] COMPLETE in', totalMs, 'ms');
+      const resultObj = {
         text: summary,
         person: {
-          name: personNode?.properties?.name,
-          email: personNode?.properties?.email,
-          properties: personNode?.properties || {},
+          name: p?.properties?.name,
+          // only expose the name property on linked nodes as requested
+          properties: p?.properties || {},
           relationships,
           relationsString: relationsList,
         },
         signal: 'DATA_READY_PERSON',
         timings: { totalMs },
       };
+      console.log('[TOOL / PersonLookup] Result:', JSON.stringify(resultObj, null, 2));
+      return resultObj;
     } catch (err) {
-      console.error('[TOOL / Person Lookup GPT] Error:', err);
-      return { text: "My memory is failing me, I can't remember that information right now." };
+      console.error('[TOOL / PersonLookup] Error:', err);
+      return { text: 'My memory is failing me right now.' };
     } finally {
       if (session) await session.close();
     }
