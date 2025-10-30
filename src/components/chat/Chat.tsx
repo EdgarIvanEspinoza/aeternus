@@ -233,8 +233,11 @@ export const Chat = ({
         )}
         {/* Input spacer to avoid last message hidden behind fixed bar */}
         <div className="pointer-events-none h-0" />
-        <div className="fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/80 to-black/0 backdrop-blur-sm border-t border-zinc-800/60">
-          <div className="mx-auto w-full max-w-[1200px] py-4">
+        <div
+          className="fixed bottom-4 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/80 to-black/0 backdrop-blur-sm border-t border-zinc-800/60"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+          <div className="mx-auto w-full max-w-[1200px] py-4" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             <ChatInputComponent disabled={loading} scrollToBottom={scrollToBottom} {...{ handleSubmit, input, handleInputChange }} />
           </div>
         </div>

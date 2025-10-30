@@ -68,7 +68,7 @@ const ChatInput = ({
 
   return (
     <div className="w-full flex flex-col items-center self-end">
-      <form onSubmit={onSubmit} className="w-full">
+  <form onSubmit={onSubmit} className="w-full" autoComplete="off">
         <Input
           // HeroUI Input ref using callback to keep strong typing
           ref={(el) => { inputRef.current = el as HTMLInputElement | null; }}
