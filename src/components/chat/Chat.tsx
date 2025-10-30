@@ -23,6 +23,7 @@ export const Chat = ({
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const keyboardSpacerRef = useRef<HTMLDivElement | null>(null);
   const autoScrollRef = useRef(true); // whether we should keep following bottom
 
   // Mostrar modal de información de Alpha al inicio - ahora se muestra siempre
@@ -127,6 +128,46 @@ export const Chat = ({
     ro.observe(content);
     return () => ro.disconnect();
   }, [messages, scrollToBottom]);
+
+  // Dynamic spacer to handle mobile keyboard visual viewport quirks (iOS/Android)
+  useEffect(() => {
+    const spacer = keyboardSpacerRef.current;
+    if (!spacer) return;
+
+    const vv = typeof window !== 'undefined' && 'visualViewport' in window ? (window as unknown as { visualViewport: VisualViewport }).visualViewport : undefined;
+    if (!vv) {
+      // No visualViewport support: keep spacer at 0
+      spacer.style.height = '0px';
+      return;
+    }
+
+    const update = () => {
+      try {
+        // compute keyboard height as the difference between layout viewport and visual viewport
+        const keyboardHeight = Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0));
+        // account for safe area inset bottom as well
+        const safeInset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom') || '0', 10) || 0;
+        const desired = Math.round(Math.max(0, keyboardHeight - safeInset));
+        spacer.style.height = `${desired}px`;
+      } catch {
+        spacer.style.height = '0px';
+      }
+    };
+
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+
+    // Also listen to window resize as an extra fallback
+    window.addEventListener('resize', update);
+
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      spacer.style.height = '0px';
+    };
+  }, []);
 
   // React to messages array changes - SIEMPRE scroll tras nuevos mensajes con repetición
   useEffect(() => {
