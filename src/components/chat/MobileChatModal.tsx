@@ -32,6 +32,35 @@ export const MobileChatModal = ({
     };
   }, [isOpen]);
 
+  // Ensure the input is focused and caret is placed when the modal opens.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Small delay to allow the modal to mount and for mobile browsers to accept the user gesture.
+    const t = setTimeout(() => {
+      try {
+        const container = containerRef.current;
+        if (!container) return;
+        const input = container.querySelector<HTMLInputElement>('input[name="chat-input"], input[aria-label="Escribe tu mensaje aquí"]');
+        if (input) {
+          input.focus({ preventScroll: true });
+          // Move caret to end
+          const len = input.value?.length || 0;
+          try {
+            input.setSelectionRange(len, len);
+          } catch (err) {
+            // ignore selection errors on some mobile browsers
+            console.debug('selectionRange error', err);
+          }
+        }
+      } catch (err) {
+        console.debug('focus attempt failed', err);
+      }
+    }, 160);
+
+    return () => clearTimeout(t);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const wrappedSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
