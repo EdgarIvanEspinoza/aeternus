@@ -125,13 +125,10 @@ export const personNodeLookupTool: Tool = {
         text: summary,
         person: {
           name: p?.properties?.name,
-          // only expose the name property on linked nodes as requested
           properties: p?.properties || {},
           relationships,
           relationsString: relationsList,
         },
-        signal: 'DATA_READY_PERSON',
-        timings: { totalMs },
       };
       console.log('[TOOL / PersonLookup] Result:', JSON.stringify(resultObj, null, 2));
       return resultObj;
