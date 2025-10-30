@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import ChatInputComponent from './ChatInput/ChatInput';
+import MobileChatModal from './MobileChatModal';
 import ChatHook from '../../hook/chat.hook';
 import { useImpersonation } from '../../context/ImpersonationContext';
 import { ChatMessage } from './ChatMessage/ChatMessage';
@@ -19,6 +20,7 @@ export const Chat = ({
   const effectiveName = impersonatedUser?.name || (jacquesMode ? 'Jacques' : getNameFromUser(user));
   const { messages, input, handleInputChange, handleSubmit, loading } = ChatHook(effectiveName);
   const [showAlphaModal, setShowAlphaModal] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -254,14 +256,35 @@ export const Chat = ({
         )}
         {/* Input spacer to avoid last message hidden behind fixed bar */}
         <div className="pointer-events-none h-0" />
+        {/* Desktop / large devices: fixed input */}
         <div
-          className="fixed bottom-4 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/80 to-black/0 backdrop-blur-sm border-t border-zinc-800/60"
+          className="hidden sm:block fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/80 to-black/0 backdrop-blur-sm border-t border-zinc-800/60"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="mx-auto w-full max-w-[1200px] py-4" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             <ChatInputComponent disabled={loading} scrollToBottom={scrollToBottom} {...{ handleSubmit, input, handleInputChange }} />
           </div>
         </div>
+
+        {/* Mobile trigger bar: full-width clickable area that opens the modal */}
+        <div className="sm:hidden fixed bottom-4 left-4 right-4 z-20">
+          <div
+            className="bg-zinc-900/80 backdrop-blur px-4 py-3 rounded-lg border border-zinc-800"
+            onClick={() => setShowMobileModal(true)}
+          >
+            <div className="text-zinc-400">Tap to open chat</div>
+          </div>
+        </div>
+
+        <MobileChatModal
+          isOpen={showMobileModal}
+          onClose={() => setShowMobileModal(false)}
+          handleSubmit={handleSubmit}
+          input={input}
+          handleInputChange={handleInputChange}
+          disabled={loading}
+          scrollToBottom={scrollToBottom}
+        />
       </div>
       
       {/* Modal informativo para usuarios de Alpha */}

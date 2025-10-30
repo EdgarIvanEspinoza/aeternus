@@ -8,12 +8,16 @@ const ChatInput = ({
   handleInputChange,
   disabled,
   scrollToBottom,
+  onMobileBlur,
+  onOpenMobile,
 }: {
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled: boolean;
   scrollToBottom?: (smooth?: boolean) => void;
+  onMobileBlur?: () => void;
+  onOpenMobile?: () => void;
 }): React.ReactElement => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -35,6 +39,18 @@ const ChatInput = ({
       // also call external scrollToBottom if provided
       scrollToBottom?.(true);
     });
+  };
+
+  const handleBlur = () => {
+    onMobileBlur?.();
+  };
+
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // on mobile we want to open the full-screen modal instead of focusing the inline input
+    if (onOpenMobile) {
+      onOpenMobile();
+      e.preventDefault();
+    }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -67,7 +83,7 @@ const ChatInput = ({
   };
 
   return (
-    <div className="w-full flex flex-col items-center self-end">
+    <div className="w-full flex flex-col items-center self-end" onClick={handleContainerClick}>
   <form onSubmit={onSubmit} className="w-full" autoComplete="off">
         <Input
           // HeroUI Input ref using callback to keep strong typing
@@ -79,6 +95,7 @@ const ChatInput = ({
           onChange={handleInputChange}
           onKeyDown={onKeyDown}
           onFocus={handleFocus}
+          onBlur={handleBlur}
           name="chat-input"
           autoComplete="off"
           autoCorrect="off"
