@@ -12,7 +12,7 @@ import driver from '../neo4j/driver';
 
 const SELF_ALIASES = [
   'lequi',
-  'lazar',
+  'lequi schwartzman',
   'lazar schwartzman',
   'assistant',
   'la ia',
