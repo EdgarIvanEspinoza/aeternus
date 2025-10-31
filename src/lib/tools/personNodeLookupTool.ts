@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { Tool } from 'ai';
 import driver from '../neo4j/driver';
@@ -32,7 +33,6 @@ export const personNodeLookupTool: Tool = {
   parameters: z.object({ query: z.string().describe('Name or email of the person to inspect') }),
   async execute({ query }) {
     const startTotal = Date.now();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let session: any = null;
     const target = normalizePerson(query);
     console.log(`[TOOL / PersonLookup] START target='${target}' raw='${query}'`);
@@ -41,20 +41,39 @@ export const personNodeLookupTool: Tool = {
 
     try {
       session = driver.session();
-
       const cypher = `/*cypher*/
         MATCH (p:Person {name: $name})
         OPTIONAL MATCH (p)-[r]-(o)
         RETURN p, collect(r) AS rels, collect(o) AS others LIMIT 1
       `;
 
-      const res = await session.run(cypher, { name: target });
-      if (!res || res.records.length === 0) return { text: `No data found for ${target}`, person: null };
+      // Race the DB call against a timeout so the tool doesn't hang the agent
+      const TIMEOUT_MS = 10000; // 10 seconds
+      const runPromise = session.run(cypher, { name: target });
+      const resOrTimeout = (await Promise.race([
+        runPromise.then((r: unknown) => ({ timedOut: false, result: r })),
+        new Promise((resolve) => setTimeout(() => resolve({ timedOut: true }), TIMEOUT_MS)),
+      ])) as { timedOut: boolean; result?: unknown };
 
-      const rec = res.records[0];
-      const p = rec.get('p');
-      const rels = Array.isArray(rec.get('rels')) ? rec.get('rels') : [];
-      const others = Array.isArray(rec.get('others')) ? rec.get('others') : [];
+      if (resOrTimeout.timedOut) {
+        console.warn('[TOOL / PersonLookup] Query timed out after', TIMEOUT_MS, 'ms');
+        try {
+          if (session) await session.close();
+        } catch {
+          /* ignore */
+        }
+        return { text: 'Perdón, la búsqueda tardó demasiado. Intenta de nuevo en unos segundos.', person: null };
+      }
+
+      type Neo4jResultLike = { records?: unknown[] };
+      const res = resOrTimeout.result as Neo4jResultLike;
+      type RecordLike = { get: (key: string) => unknown };
+      const records = Array.isArray(res.records) ? (res.records as RecordLike[]) : [];
+      if (records.length === 0) return { text: `No data found for ${target}`, person: null };
+      const rec: any = records[0];
+      const p: any = rec.get('p');
+      const rels: any[] = Array.isArray(rec.get('rels')) ? (rec.get('rels') as any[]) : [];
+      const others: any[] = Array.isArray(rec.get('others')) ? (rec.get('others') as any[]) : [];
 
       // Build raw relationship instances first
       const rawRels: Array<{
@@ -126,7 +145,7 @@ export const personNodeLookupTool: Tool = {
         person: {
           name: p?.properties?.name,
           properties: p?.properties || {},
-          relationships,
+          relationships: relationships || [],
           relationsString: relationsList,
         },
       };

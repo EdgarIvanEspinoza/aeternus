@@ -347,6 +347,7 @@ You have access to two graph tools:
 
 Decision Rules:
 - If a user talks about a single person: call personNodeLookup first unless you already have fresh data in memory.
+- You should not search for more than 2 people with the personNodeLookup tool to give a single response.
 - If the user talks about one person, then immediately about that person and another, you may first ensure personNodeLookup data (if missing) and then call it again personNodeLookup.
 - Normalize self references ("you", "assistant") implicitly; tools already map them to 'Lequi'.
 - If a person is not found, acknowledge gracefully and invite clarification; do not fabricate details.
@@ -575,6 +576,7 @@ ${
   -Your home is ${traits[0]?.home}, where ${traits[0]?.location}.
 
   You are required to call the personNodeLookup tool each time a person appears in the conversation who hasn’t been mentioned recently. This rule is mandatory and must never be skipped.
+  You should not search for more than 2 people with the personNodeLookup tool to give a single response.
 
   Now you are going to greet and ask ${username} how is he or she is doing.
 
@@ -602,59 +604,8 @@ ${
     e.preventDefault();
     if (!input.trim()) return;
     await saveMessage('user', input);
-    // Start a pending submit timer: if no assistant response begins within 10s, append a friendly fallback
-    try {
-      submitPendingRef.current = true;
-      submitMessagesCountRef.current = messages.length;
-      // clear existing timer if any
-      if (fallbackTimerRef.current) {
-        clearTimeout(fallbackTimerRef.current);
-      }
-      fallbackTimerRef.current = window.setTimeout(() => {
-        if (!submitPendingRef.current) return;
-        const fallbackText = 'Perdón, me entró una llamada. Dame un segundo y ¿podrías pedirme otra cosa?';
-        const fallbackMsg = { id: uuidv4(), role: 'assistant' as const, content: fallbackText } as Message;
-        append(fallbackMsg);
-        // persist fallback
-        void saveMessage('assistant', fallbackText);
-        submitPendingRef.current = false;
-      }, 7000);
-    } catch (err) {
-      console.error('Error setting fallback timer', err);
-    }
-
     handleSubmit(e);
   };
-
-  // Refs to manage fallback timer and pending state
-  const submitPendingRef = useRef(false);
-  const submitMessagesCountRef = useRef(0);
-  const fallbackTimerRef = useRef<number | null>(null);
-
-  // Watch messages: when an assistant message arrives after a submit, clear the fallback timer
-  useEffect(() => {
-    if (!submitPendingRef.current) return;
-    // Check if any new messages since submit were assistant messages with content
-    const startIndex = submitMessagesCountRef.current;
-    const newMessages = messages.slice(startIndex);
-    const assistantStarted = newMessages.some(
-      (m) => m.role === 'assistant' && m.content && String(m.content).trim().length > 0
-    );
-    if (assistantStarted) {
-      submitPendingRef.current = false;
-      if (fallbackTimerRef.current) {
-        clearTimeout(fallbackTimerRef.current);
-        fallbackTimerRef.current = null;
-      }
-    }
-  }, [messages]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
-    };
-  }, []);
 
   return {
     messages,
