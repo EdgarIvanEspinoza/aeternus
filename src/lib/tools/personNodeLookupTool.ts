@@ -94,33 +94,30 @@ export const personNodeLookupTool: Tool = {
         rawRels.push({ type: r.type || 'UNKNOWN', direction, otherName });
       }
 
-      // Group by other node name. Skip relations without a name.
-      const grouped = new Map<
-        string,
-        Array<{
-          type: string;
-          direction: 'OUT' | 'IN';
-        }>
-      >();
-
+      // Previously we returned a per-person JSON structure for relationships.
+      // The user requested a condensed plain-text representation grouped by
+      // relation type (one sentence per type). Build a map of type -> Set<name>.
+      const typeGroups = new Map<string, Set<string>>();
       for (const rr of rawRels) {
         if (!rr.otherName) continue; // skip unnamed nodes
-        const list = grouped.get(rr.otherName) || [];
-        list.push({ type: rr.type, direction: rr.direction });
-        grouped.set(rr.otherName, list);
+        const set = typeGroups.get(rr.type) || new Set<string>();
+        set.add(rr.otherName);
+        typeGroups.set(rr.type, set);
       }
 
-      // Convert grouped map into the unified relationships shape the user requested:
-      // [{ name: string, relations: [{type,direction}, ...] }, ...]
-      const relationships = Array.from(grouped.entries()).map(([name, rels]) => ({
-        name,
-        relations: rels,
-      }));
+      // Create one sentence per relation type. Example:
+      // "FAMILY: Alice, Bob. FRIEND: Carlos."
+      const typeSentences = Array.from(typeGroups.entries())
+        .map(([type, names]) => `${type}: ${Array.from(names).join(', ')}`)
+        .join('. ');
 
-      // Breakdown by type across all relations (for the summary)
+      const relationsByTypeString = typeSentences ? `${typeSentences}.` : 'none';
+
+      // Compute a compact breakdown like 'TYPE(count), ...' for the summary.
       const relBreakdown: Record<string, number> = {};
-      for (const relList of relationships) {
-        for (const r of relList.relations) relBreakdown[r.type] = (relBreakdown[r.type] || 0) + 1;
+      for (const entry of Array.from(typeGroups.entries())) {
+        const [type, names] = entry;
+        relBreakdown[type] = names.size;
       }
 
       const topTypes = Object.entries(relBreakdown)
@@ -129,24 +126,21 @@ export const personNodeLookupTool: Tool = {
         .map(([t, c]) => `${t}(${c})`)
         .join(', ');
 
-      // relationsString: 'Name: TYPE(OUT), TYPE2(IN); Other: ...'
-      const relationsList = relationships
-        .map((r) => `${r.name}: ${r.relations.map((x) => `${x.type}(${x.direction})`).join(', ')}`)
-        .join('; ');
-
-      const summary = `Profile of '${p?.properties?.name ?? target}': ${
-        relationships.length
-      } direct relations. Main types: ${topTypes || 'none'}. Relations: ${relationsList || 'none'}.`;
+      const totalRelations = Array.from(typeGroups.values()).reduce((s, set) => s + set.size, 0);
+      const summary = `Profile of '${p?.properties?.name ?? target}': ${totalRelations} direct relations. Main types: ${
+        topTypes || 'none'
+      }. Relations by type: ${relationsByTypeString}`;
 
       const totalMs = Date.now() - startTotal;
       console.log('[TOOL / PersonLookup] COMPLETE in', totalMs, 'ms');
       const resultObj = {
-        text: (summary && String(summary).trim()) || `Found ${relationships.length} relations for ${target}.`,
+        text: (summary && String(summary).trim()) || `Found ${totalRelations} relations for ${target}.`,
         person: {
           name: p?.properties?.name,
           properties: p?.properties || {},
-          relationships: relationships || [],
-          relationsString: relationsList,
+          // Condensed plain-text relationships grouped by type (one sentence per type)
+          relationships: relationsByTypeString,
+          relationsString: relationsByTypeString,
         },
       };
       console.log('[TOOL / PersonLookup] Result:', JSON.stringify(resultObj, null, 2));
