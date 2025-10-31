@@ -200,12 +200,17 @@ export const graphRelationshipAnalyzerTool: Tool = {
       const {
         steps: [analysisStep],
       } = await generateText({ model: openai.responses('gpt-4o'), prompt: analysisPrompt, temperature: 0.7 });
+      // Ensure the step has text to avoid returning an empty step to the caller
+      const analysisText = analysisStep?.text?.trim();
+      if (!analysisText) {
+        console.warn('[TOOL / Graph Analyzer] analysisStep returned empty text — using fallback summary');
+      }
       console.log('[TOOL / Graph Analyzer] Analysis LLM time:', Date.now() - startAnalysis, 'ms');
 
       const totalMs = Date.now() - startTotal;
       console.log('[TOOL / Graph Analyzer] COMPLETE in', totalMs, 'ms');
       return {
-        text: analysisStep.text.trim(),
+        text: analysisText || `I found connections between ${pA} and ${pB} but couldn't summarize them right now.`,
         personA: personAData,
         personB: personBData,
         rawRecords: records,

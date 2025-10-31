@@ -123,18 +123,18 @@ const ChatHook = (
     }
   }
 
-  function getSentimentTowardSentence(sentiment: string) {
+  function getSentimentTowardSentence(sentiment: string, subject: string) {
     switch (sentiment) {
       case 'LOVES':
-        return 'for which you feel love';
+        return `for which ${subject} feel love`;
       case 'HATES':
-        return 'for which you feel hate';
+        return `for which ${subject} feel hate`;
       case 'LIKES':
-        return 'whom you like';
+        return `whom ${subject} like`;
       case 'DISLIKES':
-        return 'whom you dislike';
+        return `whom ${subject} dislike`;
       default:
-        return 'for which you feel indifferent';
+        return `for which ${subject} feel indifferent`;
     }
   }
   //TODO:  Armar la build Emotional solo del Usuario
@@ -145,11 +145,11 @@ const ChatHook = (
       ai.commonFriends = ai.commonFriends.map((c: any) => (typeof c === 'string' ? c : c?.name || '')).filter(Boolean);
     }
     // Use only user-scoped arrays; do NOT fallback to ai.* fields
-    const userBestFriends: any[] = Array.isArray(ai.userBestFriends) ? ai.userBestFriends : [];
-    const userCloseFriends: any[] = Array.isArray(ai.userCloseFriends) ? ai.userCloseFriends : [];
+    const userBestFriends: any[] = Array.isArray(ai.userBestFriends) ? ai.userBestFriends : []; // BIEN
+    const userCloseFriends: any[] = Array.isArray(ai.userCloseFriends) ? ai.userCloseFriends : []; //BIEN
     const userCloseFamily: any[] = Array.isArray(ai.userCloseFamily) ? ai.userCloseFamily : [];
     const rawUserFriends: any[] = Array.isArray(ai.userFriends) ? ai.userFriends : [];
-    const commonFriends: string[] = Array.isArray(ai.commonFriends) ? ai.commonFriends : [];
+    const commonFriends: string[] = Array.isArray(ai.commonFriends) ? ai.commonFriends : []; // BIEN
 
     // If explicit userBestFriends / userCloseFriends are empty, derive them from rawUserFriends objects
     const derivedBest = rawUserFriends.filter((f) => f && (f.relationType || '').toUpperCase() === 'BEST_FRIEND');
@@ -160,8 +160,8 @@ const ChatHook = (
 
     // Build a lookup for closeFamily metadata (parentalType/sentiment) by name if available
     const closeFamilyMap: Record<string, any> = {};
-    if (Array.isArray(ai.closeFamily)) {
-      ai.closeFamily.forEach((cf: any) => {
+    if (Array.isArray(ai.userCloseFamily)) {
+      ai.userCloseFamily.forEach((cf: any) => {
         if (cf && cf.name) closeFamilyMap[String(cf.name)] = cf;
       });
     }
@@ -205,12 +205,12 @@ const ChatHook = (
       return `-The following are ${possessive ? label : label}: ${list.join(', ')}.`;
     };
 
-    const formatParentalList = () => {
-      if (!parentalRelations.length) return '-No parental relatives of the user (besides you) are registered.';
-      return `-Parental relatives of ${username}: ${parentalRelations
-        .map((r) => `${r.name} (${r.relation})`)
-        .join(', ')}.`;
-    };
+    // const formatParentalList = () => {
+    //   if (!parentalRelations.length) return '-No parental relatives of the user (besides you) are registered.';
+    //   return `-Parental relatives of ${username}: ${parentalRelations
+    //     .map((r) => `${r.name} (${r.relation})`)
+    //     .join(', ')}.`;
+    // };
 
     // Build the EMOTIONAL section specifically for the User (best/close friends & close family with sentiment)
     const formatSentimentList = (list: any[], categoryLabel: string, includeParental = false) => {
@@ -218,7 +218,9 @@ const ChatHook = (
       if (named.length === 0) return `-${username} has no ${categoryLabel}.`;
       const items = named.map((f: any) => {
         const displayName = includeParental && f.parentalType ? `${f.name} (${f.parentalType})` : f.name;
-        return f.sentiment ? `${displayName} ${getSentimentTowardSentence(f.sentiment)}` : displayName;
+        return f.sentiment
+          ? `${displayName} ${getSentimentTowardSentence(f.sentiment, username || 'you')}`
+          : displayName;
       });
       return `-The following are ${username}'s ${categoryLabel} and ${username}'s feelings towards each one: ${items.join(
         ', '
@@ -232,7 +234,7 @@ const ChatHook = (
       formatSentimentList(effectiveUserCloseFamily, 'closest family', true),
       // Additional context still useful
       formatPlainList(commonFriends, 'common friends'),
-      formatParentalList(),
+      // formatParentalList(),
       `-You feel ${ai.animicState} because ${ai.animicStateSource}.`,
       `-${username} feels ${ai.userAnimicState} because ${ai.userAnimicStateSource}.`,
     ];
@@ -414,7 +416,7 @@ ${
     ? `-The following are your best friends and your feelings towards each one: ${traits[0]?.bestFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment, 'you')}` : f.name
         )
         .join(', ')}.`
     : '-You have no best friends.'
@@ -425,7 +427,7 @@ ${
     ? `-The following are your close friends and your feelings towards each one: ${traits[0]?.closeFriends
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null }) =>
-          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment)}` : f.name
+          f.sentiment ? `${f.name} ${getSentimentTowardSentence(f.sentiment, 'you')}` : f.name
         )
         .join(', ')}.`
     : '-You have no close friends.'
@@ -437,7 +439,7 @@ ${
         .filter((f: any) => f?.name)
         .map((f: { name: string; sentiment: string | null; parentalType?: string }) => {
           const displayName = f.parentalType ? `${f.name} (${f.parentalType})` : f.name;
-          return f.sentiment ? `${displayName} ${getSentimentTowardSentence(f.sentiment)}` : displayName;
+          return f.sentiment ? `${displayName} ${getSentimentTowardSentence(f.sentiment, 'you')}` : displayName;
         })
         .join(', ')}.`
     : '-You have no close family.'

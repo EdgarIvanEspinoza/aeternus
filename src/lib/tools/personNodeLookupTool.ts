@@ -122,7 +122,7 @@ export const personNodeLookupTool: Tool = {
       const totalMs = Date.now() - startTotal;
       console.log('[TOOL / PersonLookup] COMPLETE in', totalMs, 'ms');
       const resultObj = {
-        text: summary,
+        text: (summary && String(summary).trim()) || `Found ${relationships.length} relations for ${target}.`,
         person: {
           name: p?.properties?.name,
           properties: p?.properties || {},
