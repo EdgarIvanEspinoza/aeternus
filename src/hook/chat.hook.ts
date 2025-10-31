@@ -184,9 +184,9 @@ const ChatHook = (
             const meta = closeFamilyMap[d.name] || {};
             return { name: d.name, parentalType: meta.parentalType || null, sentiment: meta.sentiment || null };
           });
-    const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
-      ? ai.userParentalRelations
-      : [];
+    // const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
+    //   ? ai.userParentalRelations
+    //   : [];
 
     // type SentRel = { name: string; sentiment: string | null };
 
@@ -601,8 +601,59 @@ ${
     e.preventDefault();
     if (!input.trim()) return;
     await saveMessage('user', input);
+    // Start a pending submit timer: if no assistant response begins within 10s, append a friendly fallback
+    try {
+      submitPendingRef.current = true;
+      submitMessagesCountRef.current = messages.length;
+      // clear existing timer if any
+      if (fallbackTimerRef.current) {
+        clearTimeout(fallbackTimerRef.current);
+      }
+      fallbackTimerRef.current = window.setTimeout(() => {
+        if (!submitPendingRef.current) return;
+        const fallbackText = 'Perdón, me entró una llamada. Dame un segundo y ¿podrías pedirme otra cosa?';
+        const fallbackMsg = { id: uuidv4(), role: 'assistant' as const, content: fallbackText } as Message;
+        append(fallbackMsg);
+        // persist fallback
+        void saveMessage('assistant', fallbackText);
+        submitPendingRef.current = false;
+      }, 7000);
+    } catch (err) {
+      console.error('Error setting fallback timer', err);
+    }
+
     handleSubmit(e);
   };
+
+  // Refs to manage fallback timer and pending state
+  const submitPendingRef = useRef(false);
+  const submitMessagesCountRef = useRef(0);
+  const fallbackTimerRef = useRef<number | null>(null);
+
+  // Watch messages: when an assistant message arrives after a submit, clear the fallback timer
+  useEffect(() => {
+    if (!submitPendingRef.current) return;
+    // Check if any new messages since submit were assistant messages with content
+    const startIndex = submitMessagesCountRef.current;
+    const newMessages = messages.slice(startIndex);
+    const assistantStarted = newMessages.some(
+      (m) => m.role === 'assistant' && m.content && String(m.content).trim().length > 0
+    );
+    if (assistantStarted) {
+      submitPendingRef.current = false;
+      if (fallbackTimerRef.current) {
+        clearTimeout(fallbackTimerRef.current);
+        fallbackTimerRef.current = null;
+      }
+    }
+  }, [messages]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
+    };
+  }, []);
 
   return {
     messages,
