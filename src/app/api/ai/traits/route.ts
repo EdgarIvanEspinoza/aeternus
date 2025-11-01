@@ -108,7 +108,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             job: p.job,
             jokeStyle: p.jokeStyle,
             joking: p.joking,
-            lang: p.lang,
+            lang: n.lang,
             location: p.location,
             loves: loves,
             mainInterests: p.mainInterests,
