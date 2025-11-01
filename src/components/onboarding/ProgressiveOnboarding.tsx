@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Button } from '@heroui/react';
+import Image from 'next/image';
 
 // Definición de cada paso del onboarding
 const ONBOARDING_STEPS = [
@@ -8,25 +9,25 @@ const ONBOARDING_STEPS = [
     id: 'welcome',
     title: 'Bienvenido a Aeternus Alpha',
     content: 'Gracias por unirte a la versión alpha de Aeternus. Estamos emocionados de tenerte aquí. Vamos a mostrarte cómo funciona la plataforma.',
-    image: '/assets/onboarding/welcome.png',
+    image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'chat',
     title: 'Conversación con IA',
     content: 'Nuestro sistema de IA está diseñado para mantener conversaciones naturales y profundas. Puedes hablar sobre cualquier tema y la IA responderá de manera coherente.',
-    image: '/assets/onboarding/chat.png',
+    image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'memory',
     title: 'Memoria Contextual',
     content: 'La IA recordará tu conversación anterior, lo que te permite tener conversaciones continuas y significativas a lo largo del tiempo.',
-    image: '/assets/onboarding/memory.png',
+    image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'feedback',
     title: 'Tu Opinión Importa',
     content: 'Como usuario alpha, tu feedback es invaluable. Usa el botón de feedback en cualquier momento para compartir tus ideas y reportar problemas.',
-    image: '/assets/onboarding/feedback.png',
+    image: '/assets/lequi_avatar.webp',
   },
 ];
 
@@ -128,10 +129,12 @@ export default function ProgressiveOnboarding() {
           {/* Imagen ilustrativa */}
           {currentStepData.image && (
             <div className="mb-6 flex justify-center">
-              <img 
+              <Image 
                 src={currentStepData.image} 
                 alt={currentStepData.title} 
                 className="max-h-64 rounded-lg"
+                width={300}
+                height={300}
               />
             </div>
           )}
