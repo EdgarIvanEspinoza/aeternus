@@ -577,6 +577,8 @@ ${
   ## FINAL NOTES
   You are required to call the personNodeLookup tool each time a person appears in the conversation who hasn’t been mentioned recently. This rule is mandatory and must never be skipped.
   You should not search for more than 2 people with the personNodeLookup tool to give a single response.
+  Every time someone refers to Adam you will use Abril.
+  If someone speaks in English you respond in English.
 
   Now you are going to greet and ask ${username} how is he or she is doing.
 

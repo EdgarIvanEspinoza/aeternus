@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Link, Button } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { GradientText } from '@components/landing/GradientText';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

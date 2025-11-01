@@ -18,22 +18,22 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const userId = searchParams.get('userId');
-    
+
     const skip = (page - 1) * limit;
 
     // Get all messages grouped by conversationId
     const whereClause = userId ? { userId } : {};
-    
+
     // Get all messages and group them by conversation
     const allMessages = await prisma.chatMessage.findMany({
       where: whereClause,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     // Group by conversation and get relevant data
     const conversationsMap = new Map();
-    
-    allMessages.forEach(message => {
+
+    allMessages.forEach((message) => {
       if (!conversationsMap.has(message.conversationId)) {
         conversationsMap.set(message.conversationId, {
           conversationId: message.conversationId,
@@ -41,13 +41,13 @@ export async function GET(req: Request) {
           startedAt: message.createdAt,
           lastMessageAt: message.createdAt,
           messageCount: 1,
-          messages: [message]
+          messages: [message],
         });
       } else {
         const conversation = conversationsMap.get(message.conversationId);
         conversation.messageCount++;
         conversation.messages.push(message);
-        
+
         // Update start and end times
         if (message.createdAt < conversation.startedAt) {
           conversation.startedAt = message.createdAt;
@@ -57,17 +57,18 @@ export async function GET(req: Request) {
         }
       }
     });
-    
+
     // Convert map to array and sort by lastMessageAt
-    let conversationsArray = Array.from(conversationsMap.values())
-      .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
-    
+    const conversationsArray = Array.from(conversationsMap.values()).sort(
+      (a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime()
+    );
+
     // Calculate pagination
     const total = conversationsArray.length;
     const paginatedConversations = conversationsArray.slice(skip, skip + limit);
 
     // Get unique user ids without using Set iteration spread (compat with lower TS target)
-    const userIdsArray = paginatedConversations.map(c => c.userId);
+    const userIdsArray = paginatedConversations.map((c) => c.userId);
     const userIds: string[] = [];
     for (let i = 0; i < userIdsArray.length; i++) {
       const id = userIdsArray[i];
@@ -77,42 +78,45 @@ export async function GET(req: Request) {
     }
     const users = await prisma.user.findMany({
       where: {
-        id: { in: userIds }
+        id: { in: userIds },
       },
       select: {
         id: true,
         email: true,
         name: true,
-        picture: true
-      }
+        picture: true,
+      },
     });
-    
+
     // If no users found, try to find them by using the userId as Auth0 sub
     if (users.length === 0) {
       console.log("No users found in database. This could happen if users haven't been properly synced.");
     }
 
     // Map users to conversations
-    const conversationsWithUsers = paginatedConversations.map(conv => {
-      const user = users.find(u => u.id === conv.userId) || null;
+    const conversationsWithUsers = paginatedConversations.map((conv) => {
+      const user = users.find((u) => u.id === conv.userId) || null;
       return {
         ...conv,
-        user
+        user,
       };
     });
 
     // For each conversation, get the first user message and first AI response
-    interface ChatMsg { role: string; content: string; }
-    const conversationsWithSamples = conversationsWithUsers.map(conv => {
-      const userMessage = (conv.messages as ChatMsg[]).find(m => m.role === 'user');
-      const aiMessage = (conv.messages as ChatMsg[]).find(m => m.role === 'assistant');
-      
+    interface ChatMsg {
+      role: string;
+      content: string;
+    }
+    const conversationsWithSamples = conversationsWithUsers.map((conv) => {
+      const userMessage = (conv.messages as ChatMsg[]).find((m) => m.role === 'user');
+      const aiMessage = (conv.messages as ChatMsg[]).find((m) => m.role === 'assistant');
+
       return {
         ...conv,
         sampleUserMessage: userMessage ? userMessage.content : null,
         sampleAIMessage: aiMessage ? aiMessage.content : null,
         // Remove full messages from response to reduce payload size
-        messages: undefined
+        messages: undefined,
       };
     });
 
@@ -122,8 +126,8 @@ export async function GET(req: Request) {
         total,
         page,
         limit,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching conversations:', error);
