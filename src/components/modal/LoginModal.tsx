@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Link, Button } from '@heroui/react';
+import { GradientText } from '@components/landing/GradientText';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement => {
   const [isHelixReady, setHelixReady] = useState(false);
 
@@ -14,6 +16,7 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
     });
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlerLoginButton = (): any => {
     window.location.href = '/api/auth/login';
   };
@@ -23,7 +26,7 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
   return (
     <Modal
       isOpen={isOpen}
-      isDismissable={true}
+      isDismissable={false}
       backdrop="blur"
       onOpenChange={onOpenChange}
       hideCloseButton={true}
@@ -35,7 +38,7 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
           <>
             <ModalHeader>
               <span id="modal-title" className="text-[18px]">
-                Bienvenido a <span className="text-[18px] font-bold">Aeternus 🐲</span>
+                Welcome to <span className="text-[18px] font-bold">Aeternus 🐲</span>
               </span>
             </ModalHeader>
             <ModalBody>
@@ -48,8 +51,8 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
               ) : (
                 <>
                   <span>
-                    Para empezar que tengas una experiencia única,
-                    <br /> debes iniciar sesión
+                    To get started and enjoy a tailored experience,
+                    <br /> please sign in
                   </span>
                   <Button
                     fullWidth
@@ -59,15 +62,13 @@ export const LoginModal = ({ isOpen, onOpenChange }: any): React.ReactElement =>
                       handlerLoginButton();
                       onClose();
                     }}>
-                    <span className="text-[18px] font-bold">Iniciar sesión</span>
+                    <span className="text-[18px] font-bold">Sign in</span>
                   </Button>
                 </>
               )}
             </ModalBody>
             <ModalFooter>
-              <Link href="/policies" color="warning">
-                Términos y condiciones
-              </Link>
+                       <span className="text-zinc-600">Built with <GradientText>Affective Intelligence</GradientText></span>
             </ModalFooter>
           </>
         )}

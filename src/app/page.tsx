@@ -4,7 +4,8 @@ import { FeatureCard } from '@components/landing/FeatureCard';
 import { Footer } from '@components/landing/Footer';
 import { GradientText } from '@components/landing/GradientText';
 import { DeepField } from '@components/landing/DeepField';
-import Link from 'next/link';
+import AcceptGate from '@components/AcceptGate';
+import AcceptCheckbox from '@components/AcceptCheckbox';
 
 export const metadata = {
   title: 'Aeternus Lab — Affective Intelligence & Persistent Identity',
@@ -82,13 +83,11 @@ const LandingPage = () => {
         <div className="font-medium tracking-tight text-5xl">
           <GradientText>Aeternus</GradientText>
         </div>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-zinc-400">
+        <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
           <a href="#features" className="hover:text-zinc-200 transition">Features</a>
           <a href="#principles" className="hover:text-zinc-200 transition">Principles</a>
           <a href="#faq" className="hover:text-zinc-200 transition">FAQ</a>
-          <Link href="/chat" className="rounded-full border border-violet-500/40 px-5 py-2 hover:border-violet-400/70 text-zinc-200 hover:text-white transition shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_0_25px_-10px_rgba(168,85,247,0.4)]">
-            Enter
-          </Link>
+          <AcceptGate className="rounded-full border border-violet-500/40 px-6 py-3 hover:border-violet-400/70 text-zinc-200 hover:text-white transition shadow-[0_6px_30px_-10px_rgba(167,139,250,0.35)] font-semibold" />
         </nav>
       </header>
       <main className="relative">
@@ -135,12 +134,21 @@ const LandingPage = () => {
             <p className="relative mt-4 max-w-2xl text-zinc-300 text-sm md:text-base leading-relaxed">
               Access the conversational environment and observe how identity and relationship evolve.
             </p>
-            <div className="relative mt-8">
-              <Link href="/chat" className="inline-flex items-center justify-center rounded-full border border-violet-500/40 bg-zinc-950/80 px-8 py-3 text-sm md:text-base font-medium text-white hover:border-violet-400/70 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_0_45px_-10px_rgba(167,139,250,0.5)] transition">
-                Enter now
-                <span className="ml-2 text-violet-300">→</span>
-              </Link>
-            </div>
+                <div className="relative mt-6 flex items-center justify-between gap-4 flex-col sm:flex-row">
+                      <div className="flex items-center gap-3">
+                        <AcceptCheckbox />
+                        <label htmlFor="accept-tnc" className="text-sm text-zinc-300">
+                          I accept the <a href="/policies" className="text-violet-300 underline">Terms & Conditions</a>
+                        </label>
+                      </div>
+
+                  <div>
+                    <AcceptGate className="inline-flex items-center justify-center rounded-full border border-violet-500/40 bg-gradient-to-br from-violet-700/80 to-violet-600/80 px-12 py-4 text-lg md:text-xl font-semibold text-white shadow-[0_10px_40px_-20px_rgba(168,85,247,0.6)] transition">
+                      Enter now
+                      <span className="ml-3 text-violet-300">→</span>
+                    </AcceptGate>
+                  </div>
+                </div>
           </div>
         </section>
       </main>
