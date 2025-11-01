@@ -3,30 +3,30 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Button } from '@heroui/react';
 import Image from 'next/image';
 
-// Definición de cada paso del onboarding
+// Definition of each onboarding step
 const ONBOARDING_STEPS = [
   {
     id: 'welcome',
-    title: 'Bienvenido a Aeternus Alpha',
-    content: 'Gracias por unirte a la versión alpha de Aeternus. Estamos emocionados de tenerte aquí. Vamos a mostrarte cómo funciona la plataforma.',
+    title: 'Welcome to Aeternus Alpha',
+    content: 'Thank you for joining the Aeternus Alpha. We\'re excited to have you here. Let us show you how the platform works.',
     image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'chat',
-    title: 'Conversación con IA',
-    content: 'Nuestro sistema de IA está diseñado para mantener conversaciones naturales y profundas. Puedes hablar sobre cualquier tema y la IA responderá de manera coherente.',
+    title: 'AI Conversation',
+    content: 'Our AI is designed to hold natural, meaningful conversations. You can talk about any topic and the AI will respond coherently.',
     image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'memory',
-    title: 'Memoria Contextual',
-    content: 'La IA recordará tu conversación anterior, lo que te permite tener conversaciones continuas y significativas a lo largo del tiempo.',
+    title: 'Contextual Memory',
+    content: 'The AI remembers prior conversations so you can have continuous, meaningful interactions over time.',
     image: '/assets/lequi_avatar.webp',
   },
   {
     id: 'feedback',
-    title: 'Tu Opinión Importa',
-    content: 'Como usuario alpha, tu feedback es invaluable. Usa el botón de feedback en cualquier momento para compartir tus ideas y reportar problemas.',
+    title: 'Your Feedback Matters',
+    content: 'As an alpha user, your feedback is invaluable. Use the feedback button anytime to share ideas or report issues.',
     image: '/assets/lequi_avatar.webp',
   },
 ];
@@ -40,13 +40,13 @@ export default function ProgressiveOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
-    // Solo iniciar si hay un usuario autenticado
+    // Only start if there's an authenticated user
     if (user) {
-      // Verificar si el usuario ha completado el onboarding
+      // Check whether the user completed onboarding
       const storedProgress = localStorage.getItem(ONBOARDING_STORAGE_KEY);
       const isCompleted = storedProgress === 'completed';
       
-      // Abrir el modal si el onboarding no está completo
+      // Open the modal if onboarding isn't complete
       if (!isCompleted) {
         setIsOpen(true);
       }
@@ -56,8 +56,8 @@ export default function ProgressiveOnboarding() {
   // Escuchar evento personalizado para mostrar el onboarding manualmente
   useEffect(() => {
     const handleShowOnboarding = () => {
-      setCurrentStep(0); // Reiniciar al primer paso
-      setIsOpen(true); // Mostrar el modal
+      setCurrentStep(0); // Reset to first step
+      setIsOpen(true); // Show the modal
     };
     
     window.addEventListener('show-onboarding', handleShowOnboarding);
@@ -114,7 +114,7 @@ export default function ProgressiveOnboarding() {
         </ModalHeader>
         
         <ModalBody className="text-base max-h-[60vh] overflow-y-auto">
-          {/* Indicador de progreso */}
+          {/* Progress indicator */}
           <div className="flex justify-center mb-6">
             {ONBOARDING_STEPS.map((step, index) => (
               <div 
@@ -126,7 +126,7 @@ export default function ProgressiveOnboarding() {
             ))}
           </div>
 
-          {/* Imagen ilustrativa */}
+          {/* Illustrative image */}
           {currentStepData.image && (
             <div className="mb-6 flex justify-center">
               <Image 
@@ -139,7 +139,7 @@ export default function ProgressiveOnboarding() {
             </div>
           )}
 
-          {/* Contenido del paso */}
+          {/* Step content */}
           <p className="text-gray-300 mb-8 text-center">
             {currentStepData.content}
           </p>
@@ -154,7 +154,7 @@ export default function ProgressiveOnboarding() {
                   onPress={handlePrevStep}
                   className="text-gray-400"
                 >
-                  Anterior
+                  Previous
                 </Button>
               ) : (
                 <Button
@@ -162,7 +162,7 @@ export default function ProgressiveOnboarding() {
                   onPress={skipOnboarding}
                   className="text-gray-400"
                 >
-                  Saltar
+                  Skip
                 </Button>
               )}
             </div>
@@ -171,7 +171,7 @@ export default function ProgressiveOnboarding() {
               variant="solid"
               onPress={handleNextStep}
             >
-              {currentStep < ONBOARDING_STEPS.length - 1 ? 'Siguiente' : 'Comenzar'}
+              {currentStep < ONBOARDING_STEPS.length - 1 ? 'Next' : 'Get started'}
             </Button>
           </div>
         </ModalFooter>
