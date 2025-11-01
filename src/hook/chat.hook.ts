@@ -92,6 +92,13 @@ const ChatHook = (
       const res = await fetch(`/api/ai/traits${queryParams}`);
       if (!res.ok) throw new Error('Server error');
       const data = await res.json();
+      // Debug: log the returned traits object to inspect userCloseFamily
+      try {
+        console.log('[fetchTraits] traits response:', JSON.parse(JSON.stringify(data)));
+        console.log('[fetchTraits] userCloseFamily:', data?.traits?.[0]?.userCloseFamily);
+      } catch (err) {
+        console.log('[fetchTraits] error logging response', err);
+      }
       return data.traits;
     } catch (err) {
       console.error('Error fetching traits:', err);
@@ -182,10 +189,8 @@ const ChatHook = (
     const effectiveUserCloseFamily =
       userCloseFamily.length > 0
         ? userCloseFamily
-        : derivedCloseFamily.map((d) => {
-            const meta = closeFamilyMap[d.name] || {};
-            return { name: d.name, parentalType: meta.parentalType || null, sentiment: meta.sentiment || null };
-          });
+        : derivedCloseFamily.map((d) => ({ name: d.name, sentiment: d.sentiment || null }));
+
     // const parentalRelations: { name: string; relation: string }[] = Array.isArray(ai.userParentalRelations)
     //   ? ai.userParentalRelations
     //   : [];
@@ -216,7 +221,9 @@ const ChatHook = (
 
     // Build the EMOTIONAL section specifically for the User (best/close friends & close family with sentiment)
     const formatSentimentList = (list: any[], categoryLabel: string, includeParental = false) => {
+      console.log(`[buildEmotionalSection] Formatting list for category: ${categoryLabel}`, list);
       const named = list.filter((f) => f && f.name);
+      console.log(`[buildEmotionalSection] ${categoryLabel}:`, named);
       if (named.length === 0) return `-${username} has no ${categoryLabel}.`;
       const items = named.map((f: any) => {
         const displayName = includeParental && f.parentalType ? `${f.name} (${f.parentalType})` : f.name;
@@ -233,7 +240,7 @@ const ChatHook = (
       // User-focused emotional lists
       formatSentimentList(effectiveUserBestFriends, 'best friends'),
       formatSentimentList(effectiveUserCloseFriends, 'close friends'),
-      formatSentimentList(effectiveUserCloseFamily, 'closest family', true),
+      formatSentimentList(effectiveUserCloseFamily, 'closest family'),
       // Additional context still useful
       formatPlainList(commonFriends, 'common friends'),
       // formatParentalList(),
