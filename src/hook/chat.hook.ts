@@ -58,7 +58,9 @@ const ChatHook = (
   }
 
   const saveMessage = async (role: 'user' | 'assistant' | 'system', content: string) => {
-    const effectiveUserId = impersonatedUser?.id || user?.sub;
+    const rawSub = user?.sub as unknown as string | undefined;
+    const extractedSub = rawSub && rawSub.startsWith('google-oauth2|') ? rawSub.split('|')[1] : rawSub;
+    const effectiveUserId = impersonatedUser?.id || extractedSub;
     if (!effectiveUserId) return;
     setSavingMessages(true);
     try {
@@ -263,7 +265,9 @@ const ChatHook = (
 
   useEffect(() => {
     const initializeMessages = async () => {
-      const effectiveUserId = impersonatedUser?.id || user?.sub;
+      const rawSub = user?.sub as unknown as string | undefined;
+      const extractedSub = rawSub && rawSub.startsWith('google-oauth2|') ? rawSub.split('|')[1] : rawSub;
+      const effectiveUserId = impersonatedUser?.id || extractedSub;
       if (!effectiveUserId) return;
       setLoading(true);
       const [traits, msgRes] = await Promise.all([

@@ -26,13 +26,16 @@ export default function FeedbackWidget() {
     setIsSubmitting(true);
 
     try {
+      const rawSub = (user?.sub as unknown) as string | undefined;
+      const userId = rawSub && rawSub.startsWith('google-oauth2|') ? rawSub.split('|')[1] : rawSub;
+
       const response = await fetch('/api/feedback/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: feedbackType,
           content: feedbackText,
-          userId: user?.sub || 'anonymous',
+          userId: userId || 'anonymous',
           userEmail: user?.email || 'anonymous'
         }),
       });

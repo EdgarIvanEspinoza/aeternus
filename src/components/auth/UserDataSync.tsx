@@ -10,13 +10,17 @@ export function UserDataSync() {
     const saveUserToDatabase = async () => {
       if (user && !isLoading) {
         try {
+          // Extract google id from Auth0 'sub' when applicable (google-oauth2|<id>)
+          const rawSub = (user.sub as unknown) as string | undefined;
+          const userIdToStore = rawSub && rawSub.startsWith('google-oauth2|') ? rawSub.split('|')[1] : rawSub;
+
           await fetch('/api/user/save', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              sub: user.sub,
+              sub: userIdToStore,
               name: user.name,
               email: user.email,
               picture: user.picture,

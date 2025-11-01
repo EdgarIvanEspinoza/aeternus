@@ -11,10 +11,13 @@ export const ResetConversationButton = () => {
     if (!user?.sub) return;
     setLoading(true);
     try {
+      const rawSub = (user.sub as unknown) as string | undefined;
+      const userId = rawSub && rawSub.startsWith('google-oauth2|') ? rawSub.split('|')[1] : rawSub;
+
       const res = await fetch('/api/chat/deleteMessages', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.sub }),
+        body: JSON.stringify({ userId }),
       });
 
       const data = await res.json();
