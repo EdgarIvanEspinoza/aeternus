@@ -103,7 +103,7 @@ const ChatInput = ({
           spellCheck="false"
           inputMode="text"
           enterKeyHint="send"
-          aria-label="Escribe tu mensaje aquí"
+          aria-label="Write and receive wisdom..."
           fullWidth
           size="lg"
           type="text"
