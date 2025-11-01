@@ -27,6 +27,7 @@ export const ALLOWED_EMAILS: string[] = [
   'joanaherrera3@gmail.com',
   'lzh015@gmail.com',
   'jwinter@wishtlatam.com',
+  'ivan.espinoza@native-instruments.com',
   // Add more emails as needed
 ];
 
