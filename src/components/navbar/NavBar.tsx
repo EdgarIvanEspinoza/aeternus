@@ -100,16 +100,16 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
           </Button>
         )}
         
-        {/* Botón de Feedback - always visible */}
+        {/* Feedback button - always visible */}
         <Button
-          isIconOnly
           color="primary"
           variant="flat"
-          aria-label="Enviar feedback"
-          className="mr-2"
+          aria-label="Feedback"
+          className="mr-2 flex items-center gap-2"
           onPress={() => window.dispatchEvent(new CustomEvent('toggle-feedback'))}
         >
           <MessageSquarePlus size={20} />
+          <span>Feedback</span>
         </Button>
         
         <Dropdown
@@ -134,7 +134,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 size="sm"
                 className="ml-2"
               />
-              <span className="hidden sm:inline text-sm">Menú</span>
+              <span className="hidden sm:inline text-sm">Menu</span>
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Menu" className="p-3">
@@ -148,7 +148,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
             <DropdownSection aria-label="Mobile Actions" className="sm:hidden">
               <DropdownItem key="mobile_chat" className={!isChat ? undefined : undefined}>
                 {/* Only show on mobile and when not in chat; wrapper section already hidden on sm+ */}
-                {!isChat ? (
+                {!isChat ? (  
                   <NextLink href="/chat" className="text-current">
                     Ir al Chat
                   </NextLink>
@@ -224,7 +224,7 @@ const NavbarComponent = ({ adminMode, jacquesMode, setAdminMode, setJacquesMode 
                 key="show_onboarding" 
                 onPress={() => window.dispatchEvent(new CustomEvent('show-onboarding'))}
               >
-                Ver guía de inicio
+                View onboarding guide
               </DropdownItem>
               <DropdownItem key="terms_and_conditions" href="/policies">
                 <HeroUILink href="/policies">Terms & Condition</HeroUILink>

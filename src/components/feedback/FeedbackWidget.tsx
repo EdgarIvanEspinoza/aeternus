@@ -5,11 +5,11 @@ import { Button, Textarea, Select, SelectItem } from '@heroui/react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 const FEEDBACK_TYPES = [
-  { value: 'bug', label: 'Error o problema técnico' },
-  { value: 'suggestion', label: 'Sugerencia de mejora' },
-  { value: 'experience', label: 'Experiencia de usuario' },
-  { value: 'content', label: 'Contenido o respuestas de la IA' },
-  { value: 'other', label: 'Otro' }
+  { value: 'bug', label: 'Bug or technical issue' },
+  { value: 'suggestion', label: 'Improvement suggestion' },
+  { value: 'experience', label: 'User experience' },
+  { value: 'content', label: 'AI content or responses' },
+  { value: 'other', label: 'Other' }
 ];
 
 export default function FeedbackWidget() {
@@ -102,13 +102,13 @@ export default function FeedbackWidget() {
         <div className="p-4">
           {isSubmitted ? (
             <div className="text-center">
-              <h3 className="text-xl font-bold mb-2">¡Gracias!</h3>
-              <p>Tu feedback es muy valioso para mejorar Aeternus.</p>
+              <h3 className="text-xl font-bold mb-2">Thank you!</h3>
+              <p>Your feedback is very valuable to improve Aeternus.</p>
             </div>
           ) : (
             <>
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold">Comparte tu opinión</h3>
+                <h3 className="text-lg font-bold">Share your feedback</h3>
                 <button 
                   onClick={() => setIsOpen(false)}
                   className="text-gray-400 hover:text-white transition-colors"
@@ -117,9 +117,9 @@ export default function FeedbackWidget() {
                 </button>
               </div>
               <div className="space-y-4">
-                <Select 
-                  label="Tipo de feedback" 
-                  placeholder="Selecciona una categoría"
+                  <Select 
+                  label="Feedback type" 
+                  placeholder="Select a category"
                   value={feedbackType}
                   onChange={(e) => setFeedbackType(e.target.value)}
                   className="w-full"
@@ -132,8 +132,8 @@ export default function FeedbackWidget() {
                 </Select>
                 
                 <Textarea
-                  label="Tus comentarios"
-                  placeholder="Describe tu experiencia, problema o sugerencia..."
+                  label="Your comments"
+                  placeholder="Describe your experience, issue, or suggestion..."
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
                   rows={4}
@@ -147,11 +147,11 @@ export default function FeedbackWidget() {
                   isDisabled={!feedbackText.trim() || !feedbackType || isSubmitting}
                   onPress={handleSubmit}
                 >
-                  Enviar feedback
+                  Send feedback
                 </Button>
                 
                 <p className="text-xs text-gray-400 mt-2">
-                  Tu feedback nos ayuda a mejorar Aeternus para todos los usuarios.
+                  Your feedback helps us improve Aeternus for all users.
                 </p>
               </div>
             </>
