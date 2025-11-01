@@ -89,7 +89,7 @@ const ChatInput = ({
           // HeroUI Input ref using callback to keep strong typing
           ref={(el) => { inputRef.current = el as HTMLInputElement | null; }}
           disabled={disabled || submitting}
-          placeholder="Escribe y recibe sabiduría..."
+          placeholder="Write and receive wisdom..."
           value={input}
           variant="faded"
           onChange={handleInputChange}
