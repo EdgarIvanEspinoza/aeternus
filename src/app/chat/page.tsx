@@ -1,14 +1,16 @@
-"use client";
+'use client';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation';
 import { Chat } from '@components/chat/Chat';
 import NavBar from '@components/navbar/NavBar';
 import { useDisclosure } from '@heroui/react';
 import { LoginModal } from '@components/modal/LoginModal';
-import { isUserAllowed } from '../../config/alpha-access';
+import { checkUserIsAdmin } from '@utils/main.utils';
 
 const ChatPage = (): ReactElement => {
   const { user, isLoading } = useUser();
+  const router = useRouter();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [adminMode, setAdminMode] = useState<boolean>(false);
   const [jacquesMode, setJacquesMode] = useState<boolean>(false);
@@ -27,12 +29,15 @@ const ChatPage = (): ReactElement => {
         onOpen();
       } else {
         onClose();
-        // Check if user's email is in the allowed list
-        const allowed = isUserAllowed(user.email);
+        // Only allow admin users
+        const allowed = checkUserIsAdmin(user.email || '');
         setIsAllowed(allowed);
+        if (!allowed) {
+          router.push('/');
+        }
       }
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, router]);
 
   return (
     <>
@@ -52,9 +57,7 @@ const ChatPage = (): ReactElement => {
           }}
         />
         <main className="flex-1 flex flex-col items-center w-full pt-14">
-          {!isLoading && user && isAllowed && (
-            <Chat jacquesMode={jacquesMode} adminMode={adminMode} />
-          )}
+          {!isLoading && user && isAllowed && <Chat jacquesMode={jacquesMode} adminMode={adminMode} />}
           {!isLoading && user && !isAllowed && (
             <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto">
               <div className="bg-zinc-900/60 p-8 rounded-xl border border-zinc-800 shadow-2xl text-center">
@@ -66,14 +69,13 @@ const ChatPage = (): ReactElement => {
                   This application is currently in alpha testing phase and requires special access.
                 </p>
                 <p className="mb-6">
-                  Your email is not currently on our alpha test access list. If you believe this is an error or 
-                  would like to request access, please contact the administrator.
+                  Your email is not currently on our alpha test access list. If you believe this is an error or would
+                  like to request access, please contact the administrator.
                 </p>
                 <div className="flex justify-center gap-4">
-                  <a 
+                  <a
                     href="/api/auth/logout?returnTo=/"
-                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
-                  >
+                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors">
                     Logout & Return Home
                   </a>
                 </div>
